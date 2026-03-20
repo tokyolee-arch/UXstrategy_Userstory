@@ -17,6 +17,7 @@ import {
 import { Loader2, NotebookPen } from "lucide-react";
 
 const PARTS = ["UX1", "UX2", "유저빌러티", "스튜디오"] as const;
+const TEAM_CODE = "YXHC-5";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [part, setPart] = useState<string>(PARTS[0]);
+  const [teamCode, setTeamCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -65,6 +67,10 @@ export default function AuthPage() {
     }
     if (password.length < 6) {
       setError("비밀번호는 최소 6자 이상이어야 합니다.");
+      return;
+    }
+    if (teamCode.trim().toUpperCase() !== TEAM_CODE) {
+      setError("팀코드가 올바르지 않습니다. 팀코드를 확인해주세요.");
       return;
     }
     setError(null);
@@ -217,8 +223,23 @@ export default function AuthPage() {
                   placeholder="6자 이상"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="signup-teamcode">
+                  팀코드 <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="signup-teamcode"
+                  type="text"
+                  placeholder="팀에서 공유받은 코드를 입력하세요"
+                  value={teamCode}
+                  onChange={(e) => setTeamCode(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSignUp()}
                 />
+                <p className="text-[11px] text-muted-foreground">
+                  팀 내부에서 공유된 코드가 있어야 가입할 수 있습니다.
+                </p>
               </div>
               {error && (
                 <p className="text-sm text-destructive">{error}</p>
