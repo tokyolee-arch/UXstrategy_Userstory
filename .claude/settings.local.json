@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(start \"\" \"C:/도쿄리 작업공간/업무 관련/User Story/미래모빌리티_유저스토리_기획안.html\")",
+      "Bash(pip install:*)",
+      "Bash(python -m pip install fastapi uvicorn python-pptx pydantic)",
+      "Bash(python -m uvicorn app:app --host 0.0.0.0 --port 8000)",
+      "Bash(curl -s http://localhost:8000/api/stages)",
+      "Bash(\"/c/도쿄리 작업공간/업무 관련/User Story/backend/data/stories.json\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8000/)",
+      "Bash(python -m uvicorn app:app --host 0.0.0.0 --port 8000 --reload)"
+    ]
+  }
+}

@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="ko" class="theme-dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>미래 모빌리티 유저 스토리 기획안</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { interpolate-size: allow-keywords; }
+
+    html.theme-dark {
+      --bg: #0c0c1d; --surface: #151530; --surface-hover: #1e1e42;
+      --border: rgba(255,255,255,0.06);
+      --text: #EDEDED; --text-secondary: #8a8aac;
+      --accent: #00d4ff; --accent-secondary: #8b5cf6;
+      --positive: #10b981; --negative: #f43f5e; --warning: #f59e0b;
+      --story1: #ff8c42; --story2: #10b981; --story3: #a78bfa;
+      --hero-gradient: linear-gradient(135deg, #0c0c1d 0%, #1a1a3e 40%, #0f2847 100%);
+    }
+    html.theme-light {
+      --bg: #f8f9fc; --surface: #ffffff; --surface-hover: #f0f1f5;
+      --border: rgba(0,0,0,0.08);
+      --text: #0f172a; --text-secondary: #64748b;
+      --accent: #0284c7; --accent-secondary: #7c3aed;
+      --positive: #059669; --negative: #e11d48; --warning: #d97706;
+      --story1: #ea580c; --story2: #059669; --story3: #7c3aed;
+      --hero-gradient: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 40%, #ede9fe 100%);
+    }
+
+    body {
+      font-family: 'Noto Sans KR', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg); color: var(--text);
+      line-height: 1.7; -webkit-font-smoothing: antialiased;
+      transition: background 0.3s, color 0.3s;
+    }
+    h1,h2,h3,h4 { color: var(--text); letter-spacing: -0.03em; line-height: 1.2; text-wrap: balance; }
+    h1 { font-size: 3rem; font-weight: 800; }
+    h2 { font-size: 2rem; font-weight: 700; }
+    h3 { font-size: 1.5rem; font-weight: 600; }
+    h4 { font-size: 1.15rem; font-weight: 600; }
+    p, li, span, label { color: var(--text); font-weight: 400; }
+    .text-secondary { color: var(--text-secondary); }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 28px;
+      transition: box-shadow 0.2s ease;
+    }
+    .card:hover { box-shadow: 0 0 0 1px var(--border), 0 8px 24px rgba(0,0,0,0.12); }
+
+    /* Animations */
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    .animate { animation: fadeInUp 0.6s ease-out both; }
+    .animate.delay-1 { animation-delay: 0.1s; }
+    .animate.delay-2 { animation-delay: 0.2s; }
+    .animate.delay-3 { animation-delay: 0.3s; }
+    .animate.delay-4 { animation-delay: 0.4s; }
+    .animate.delay-5 { animation-delay: 0.5s; }
+    .animate.delay-6 { animation-delay: 0.6s; }
+    .reveal { opacity:0; transform:translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .reveal { opacity:1; transform:none; }
+    }
+
+    @media print {
+      body { background: white !important; color: black !important; }
+      .viz-menu { display: none !important; }
+      .reveal { opacity:1 !important; transform:none !important; }
+      .card { break-inside: avoid; border: 1px solid #ddd; box-shadow: none; }
+      * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .hero-section { min-height: auto !important; padding: 60px 0 !important; }
+    }
+    @page { margin: 0.75in; }
+
+    /* Menu */
+    .viz-menu { position: fixed; top: 16px; right: 16px; z-index: 9999; }
+    .viz-menu-toggle {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(12px); transition: all 0.2s;
+    }
+    .viz-menu-toggle:hover { background: var(--surface-hover); }
+    .viz-menu-dropdown {
+      position: absolute; top: 52px; right: 0; min-width: 200px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 8px;
+      opacity:0; visibility:hidden; transform:translateY(-8px);
+      transition: all 0.2s; backdrop-filter: blur(16px);
+    }
+    .viz-menu-dropdown.open { opacity:1; visibility:visible; transform:translateY(0); }
+    .viz-menu-dropdown button {
+      width:100%; padding:10px 14px; border:none; border-radius:8px;
+      background:transparent; color:var(--text); font-size:14px;
+      font-family:inherit; cursor:pointer; text-align:left;
+      display:flex; align-items:center; gap:10px; transition:background 0.15s;
+    }
+    .viz-menu-dropdown button:hover { background: var(--surface-hover); }
+
+    .skip-link {
+      position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:10000;
+      padding:8px 16px;background:var(--accent);color:white;text-decoration:none;border-radius:4px;
+    }
+    .skip-link:focus { position:fixed;left:16px;top:16px;width:auto;height:auto;overflow:visible; }
+
+    /* === HERO === */
+    .hero-section {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: var(--hero-gradient); position: relative; overflow: hidden;
+      padding: 80px 32px;
+    }
+    .hero-section::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 70% 30%, rgba(0,212,255,0.08) 0%, transparent 60%),
+                  radial-gradient(circle at 30% 70%, rgba(139,92,246,0.06) 0%, transparent 50%);
+    }
+    .hero-content { text-align: center; position: relative; z-index: 1; max-width: 800px; }
+    .hero-badge {
+      display: inline-block; padding: 6px 18px; border-radius: 20px;
+      background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2);
+      color: var(--accent); font-size: 0.85rem; font-weight: 500; margin-bottom: 24px;
+    }
+    .hero-content h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: 16px; }
+    .hero-subtitle { font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 40px; }
+    .hero-date { font-size: 0.95rem; color: var(--text-secondary); margin-top: 32px; }
+
+    /* === TEAM === */
+    .team-grid {
+      display: grid; gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+    .team-card { text-align: center; padding: 32px 20px; }
+    .team-icon {
+      width: 64px; height: 64px; border-radius: 16px; margin: 0 auto 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .team-card h4 { margin-bottom: 4px; }
+    .team-role { font-size: 0.85rem; color: var(--accent); font-weight: 500; margin-bottom: 8px; }
+    .team-desc { font-size: 0.9rem; color: var(--text-secondary); }
+
+    /* === STORY SECTIONS === */
+    .story-section { padding: 80px 0; }
+    .story-header { margin-bottom: 48px; }
+    .story-num {
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .story-header h2 { margin-bottom: 16px; }
+    .story-bg {
+      padding: 24px; border-radius: 12px; margin-bottom: 32px;
+      background: var(--surface); border-left: 4px solid;
+      font-size: 1rem; line-height: 1.8; color: var(--text-secondary);
+    }
+    .story-bg .customer-need {
+      display: block; margin-top: 12px; font-weight: 600;
+      color: var(--text); font-size: 1.05rem;
+    }
+
+    /* Flow Diagram */
+    .flow-section, .system-section { margin-bottom: 48px; }
+    .flow-section h3, .system-section h3 { margin-bottom: 20px; font-size: 1.25rem; }
+    .diagram-wrap {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 32px; overflow-x: auto;
+    }
+    .diagram-wrap svg { display: block; margin: 0 auto; }
+
+    /* Tech Tags */
+    .tech-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 48px; }
+    .tech-tag {
+      padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;
+      background: var(--surface); border: 1px solid var(--border);
+    }
+
+    /* Comments */
+    .comments-section h3 { margin-bottom: 20px; }
+    .comment-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .comment-card {
+      padding: 20px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; font-size: 0.95rem;
+    }
+    .comment-name { font-weight: 600; margin-bottom: 2px; }
+    .comment-role { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px; }
+    .comment-text { color: var(--text-secondary); line-height: 1.7; }
+
+    /* === ROADMAP === */
+    .roadmap-section { padding: 80px 0; }
+    .timeline-wrap { position: relative; padding: 20px 0; }
+    .timeline-line {
+      position: absolute; top: 0; bottom: 0; left: 50%;
+      width: 2px; background: var(--border); transform: translateX(-50%);
+    }
+    .timeline-items { display: flex; flex-direction: column; gap: 40px; position: relative; }
+    .timeline-item {
+      display: flex; align-items: center; gap: 32px;
+    }
+    .timeline-item:nth-child(odd) { flex-direction: row; }
+    .timeline-item:nth-child(even) { flex-direction: row-reverse; }
+    .timeline-content { flex: 1; }
+    .timeline-dot {
+      width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.85rem; color: white; z-index: 1;
+    }
+    .timeline-content .card { padding: 24px; }
+    .timeline-year { font-weight: 700; font-size: 1.1rem; margin-bottom: 4px; }
+    .timeline-desc { color: var(--text-secondary); font-size: 0.95rem; }
+
+    /* Effects */
+    .effect-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-top: 40px; }
+    .effect-card { text-align: center; padding: 32px 20px; }
+    .effect-icon { font-size: 2rem; margin-bottom: 12px; }
+    .effect-card h4 { margin-bottom: 8px; }
+    .effect-card p { color: var(--text-secondary); font-size: 0.9rem; }
+
+    /* Dividers */
+    .section-divider {
+      height: 1px; background: var(--border); margin: 0;
+    }
+
+    /* Tab navigation for stories */
+    .story-nav {
+      display: flex; gap: 12px; margin-bottom: 48px; flex-wrap: wrap; justify-content: center;
+    }
+    .story-nav-btn {
+      padding: 10px 24px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text); font-family: inherit;
+      font-size: 0.95rem; cursor: pointer; transition: all 0.2s; font-weight: 500;
+    }
+    .story-nav-btn:hover { background: var(--surface-hover); }
+    .story-nav-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(0,212,255,0.05); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container { padding: 0 20px; }
+      h1 { font-size: 2.2rem; }
+      h2 { font-size: 1.6rem; }
+      .team-grid { grid-template-columns: 1fr; }
+      .comment-grid { grid-template-columns: 1fr; }
+      .timeline-line { left: 24px; }
+      .timeline-item, .timeline-item:nth-child(even) { flex-direction: row; }
+      .timeline-dot { width: 40px; height: 40px; font-size: 0.75rem; }
+      .story-section { padding: 48px 0; }
+      .effect-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 375px) {
+      body { overflow-x: hidden; }
+      .card { padding: 16px; }
+      h1 { font-size: 1.8rem; }
+    }
+
+    /* SVG Styles */
+    .flow-box { fill: var(--surface); stroke-width: 1.5; }
+    .flow-text { font-family: 'Noto Sans KR', sans-serif; font-size: 12px; fill: var(--text); }
+    .flow-subtext { font-family: 'Noto Sans KR', sans-serif; font-size: 10px; fill: var(--text-secondary); }
+    .flow-arrow { stroke-width: 2; fill: none; }
+    .system-box { rx: 8; ry: 8; stroke-width: 1.5; }
+
+    html.theme-dark .flow-box { fill: #1a1a3e; stroke: rgba(255,255,255,0.1); }
+    html.theme-dark .flow-arrow { stroke: rgba(255,255,255,0.3); }
+    html.theme-dark .flow-text { fill: #EDEDED; }
+    html.theme-dark .flow-subtext { fill: #8a8aac; }
+    html.theme-dark .system-box { fill: #1a1a3e; stroke: rgba(255,255,255,0.1); }
+
+    html.theme-light .flow-box { fill: #f8f9fc; stroke: rgba(0,0,0,0.12); }
+    html.theme-light .flow-arrow { stroke: rgba(0,0,0,0.25); }
+    html.theme-light .flow-text { fill: #0f172a; }
+    html.theme-light .flow-subtext { fill: #64748b; }
+    html.theme-light .system-box { fill: #f8f9fc; stroke: rgba(0,0,0,0.12); }
+
+    .accent-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
+
+    /* Footer */
+    .footer { padding: 40px 0; text-align: center; color: var(--text-secondary); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 48px; }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- MENU -->
+  <div class="viz-menu">
+    <button class="viz-menu-toggle" onclick="toggleMenu()" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+      </svg>
+    </button>
+    <div class="viz-menu-dropdown" id="vizMenuDropdown">
+      <button onclick="cycleTheme()"><span id="themeIcon">&#127769;</span><span id="themeLabel">Dark</span></button>
+      <button onclick="downloadImage()"><span>&#128229;</span><span>Download PNG</span></button>
+      <button onclick="window.print()"><span>&#128424;</span><span>Print / PDF</span></button>
+    </div>
+  </div>
+
+  <main id="main-content" role="main">
+
+    <!-- ========== HERO ========== -->
+    <section class="hero-section" aria-label="Cover">
+      <div class="hero-content">
+        <div class="animate">
+          <svg width="120" height="80" viewBox="0 0 120 80" fill="none" style="margin:0 auto 24px;">
+            <path d="M15 50 Q20 30 40 28 L80 28 Q100 30 105 50 L108 55 Q110 60 105 60 L15 60 Q10 60 12 55 Z" stroke="var(--accent)" stroke-width="2" fill="none" opacity="0.8"/>
+            <circle cx="32" cy="60" r="8" stroke="var(--accent)" stroke-width="2" fill="none"/>
+            <circle cx="88" cy="60" r="8" stroke="var(--accent)" stroke-width="2" fill="none"/>
+            <path d="M42 28 L48 18 L72 18 L78 28" stroke="var(--accent)" stroke-width="1.5" fill="none" opacity="0.5"/>
+            <line x1="25" y1="45" x2="95" y2="45" stroke="var(--accent)" stroke-width="1" opacity="0.3"/>
+            <circle cx="60" cy="12" r="3" fill="var(--accent)" opacity="0.4"/>
+            <line x1="60" y1="9" x2="60" y2="3" stroke="var(--accent)" stroke-width="1" opacity="0.3"/>
+            <line x1="55" y1="7" x2="60" y2="3" stroke="var(--accent)" stroke-width="1" opacity="0.2"/>
+            <line x1="65" y1="7" x2="60" y2="3" stroke="var(--accent)" stroke-width="1" opacity="0.2"/>
+          </svg>
+        </div>
+        <div class="hero-badge animate delay-1">CONCEPT PLANNING REPORT</div>
+        <h1 class="animate delay-2">미래 모빌리티<br>유저 스토리 기획안</h1>
+        <p class="hero-subtitle animate delay-3">고객 니즈 기반 신기술 컨셉 기획</p>
+        <div class="story-nav animate delay-4">
+          <button class="story-nav-btn" onclick="scrollToSection('team')">팀 소개</button>
+          <button class="story-nav-btn" onclick="scrollToSection('story1')" style="border-color:var(--story1);color:var(--story1);">1편 추억여행</button>
+          <button class="story-nav-btn" onclick="scrollToSection('story2')" style="border-color:var(--story2);color:var(--story2);">2편 자가진단</button>
+          <button class="story-nav-btn" onclick="scrollToSection('story3')" style="border-color:var(--story3);color:var(--story3);">3편 집사 AI</button>
+          <button class="story-nav-btn" onclick="scrollToSection('roadmap')">로드맵</button>
+        </div>
+        <p class="hero-date animate delay-5">2026년 3월 | 컨셉 기획팀</p>
+      </div>
+    </section>
+
+    <!-- ========== TEAM ========== -->
+    <section id="team" class="story-section" aria-label="Team">
+      <div class="container">
+        <div class="story-header" data-reveal>
+          <p class="story-num" style="color:var(--accent);">CONCEPT PLANNING TEAM</p>
+          <h2>컨셉 기획팀 소개</h2>
+          <p class="text-secondary" style="margin-top:8px;">5명의 전문가가 고객 중심의 미래 모빌리티 컨셉을 기획합니다.</p>
+        </div>
+        <div class="team-grid">
+          <!-- Member 1 -->
+          <div class="card team-card" data-reveal>
+            <div class="team-icon" style="background:rgba(0,212,255,0.1);">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5">
+                <rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6M9 13h4"/><circle cx="16" cy="16" r="2"/>
+              </svg>
+            </div>
+            <h4>박준혁</h4>
+            <p class="team-role">차량 시스템 개발자</p>
+            <p class="team-desc">ECU/소프트웨어 아키텍처 전문<br>차량 시스템 통합 설계 담당</p>
+          </div>
+          <!-- Member 2 -->
+          <div class="card team-card" data-reveal>
+            <div class="team-icon" style="background:rgba(255,140,66,0.1);">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--story1)" stroke-width="1.5">
+                <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+              </svg>
+            </div>
+            <h4>김서연</h4>
+            <p class="team-role" style="color:var(--story1);">기능 스토리 기획자</p>
+            <p class="team-desc">UX 시나리오 설계 전문<br>고객 여정 맵 및 기능 스토리 작성</p>
+          </div>
+          <!-- Member 3 -->
+          <div class="card team-card" data-reveal>
+            <div class="team-icon" style="background:rgba(16,185,129,0.1);">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--story2)" stroke-width="1.5">
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+              </svg>
+            </div>
+            <h4>이하진</h4>
+            <p class="team-role" style="color:var(--story2);">소비자 검증 담당</p>
+            <p class="team-desc">소비자 리서치 전문<br>고객 인터뷰/설문 기반 니즈 검증</p>
+          </div>
+          <!-- Member 4 -->
+          <div class="card team-card" data-reveal>
+            <div class="team-icon" style="background:rgba(167,139,250,0.1);">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--story3)" stroke-width="1.5">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <h4>최민수</h4>
+            <p class="team-role" style="color:var(--story3);">신기술 담당</p>
+            <p class="team-desc">AI/자율주행 기술 리서치<br>신기술 트렌드 분석 및 적용 가능성 평가</p>
+          </div>
+          <!-- Member 5 -->
+          <div class="card team-card" data-reveal>
+            <div class="team-icon" style="background:rgba(244,63,94,0.1);">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--negative)" stroke-width="1.5">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+              </svg>
+            </div>
+            <h4>정유나</h4>
+            <p class="team-role" style="color:var(--negative);">홍보 광고 기획자</p>
+            <p class="team-desc">마케팅 커뮤니케이션 전문<br>컨셉 스토리텔링 및 홍보 전략</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ========== STORY 1 ========== -->
+    <section id="story1" class="story-section" aria-label="User Story 1">
+      <div class="container">
+        <div class="story-header" data-reveal>
+          <p class="story-num" style="color:var(--story1);"><span class="accent-dot" style="background:var(--story1);"></span>USER STORY EP.01</p>
+          <h2>한 장의 추억사진으로 떠나는 무작정 여행</h2>
+        </div>
+
+        <div class="story-bg" data-reveal style="border-color:var(--story1);">
+          과거 가족여행에서 찍은 해변 사진 한 장. 그때 그 장소에 다시 가고 싶지만 어디였는지 기억나지 않는다. 차량 인포테인먼트에 사진을 보여주자, AI가 장소를 분석하고 최적 경로를 추천하며 자율주행으로 안내한다.
+          <span class="customer-need">"사진 한 장으로 추억의 장소를 찾아 떠나고 싶다"</span>
+        </div>
+
+        <!-- Flow Diagram -->
+        <div class="flow-section" data-reveal>
+          <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--story1)" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>시나리오 플로우</h3>
+          <div class="diagram-wrap">
+            <svg width="900" height="140" viewBox="0 0 900 140" fill="none">
+              <!-- Step 1 -->
+              <rect x="5" y="30" width="120" height="80" rx="10" class="flow-box"/>
+              <text x="65" y="62" text-anchor="middle" class="flow-text">사진 선택</text>
+              <text x="65" y="80" text-anchor="middle" class="flow-subtext">스마트폰 갤러리</text>
+              <!-- Arrow -->
+              <line x1="125" y1="70" x2="155" y2="70" class="flow-arrow" marker-end="url(#arrow1)"/>
+              <!-- Step 2 -->
+              <rect x="155" y="30" width="120" height="80" rx="10" class="flow-box"/>
+              <text x="215" y="62" text-anchor="middle" class="flow-text">차량 전송</text>
+              <text x="215" y="80" text-anchor="middle" class="flow-subtext">IVI 디스플레이</text>
+              <!-- Arrow -->
+              <line x1="275" y1="70" x2="305" y2="70" class="flow-arrow" marker-end="url(#arrow1)"/>
+              <!-- Step 3 -->
+              <rect x="305" y="30" width="130" height="80" rx="10" class="flow-box" style="stroke:var(--story1);stroke-width:2;"/>
+              <text x="370" y="58" text-anchor="middle" class="flow-text" style="font-weight:600;">AI 이미지 분석</text>
+              <text x="370" y="76" text-anchor="middle" class="flow-subtext">장소/시간/날씨</text>
+              <text x="370" y="92" text-anchor="middle" class="flow-subtext">추론</text>
+              <!-- Arrow -->
+              <line x1="435" y1="70" x2="465" y2="70" class="flow-arrow" marker-end="url(#arrow1)"/>
+              <!-- Step 4 -->
+              <rect x="465" y="30" width="120" height="80" rx="10" class="flow-box"/>
+              <text x="525" y="62" text-anchor="middle" class="flow-text">여행지 추천</text>
+              <text x="525" y="80" text-anchor="middle" class="flow-subtext">위치 매칭 &amp; POI</text>
+              <!-- Arrow -->
+              <line x1="585" y1="70" x2="615" y2="70" class="flow-arrow" marker-end="url(#arrow1)"/>
+              <!-- Step 5 -->
+              <rect x="615" y="30" width="130" height="80" rx="10" class="flow-box"/>
+              <text x="680" y="62" text-anchor="middle" class="flow-text">경로 생성</text>
+              <text x="680" y="80" text-anchor="middle" class="flow-subtext">맛집/숙소 추천</text>
+              <!-- Arrow -->
+              <line x1="745" y1="70" x2="775" y2="70" class="flow-arrow" marker-end="url(#arrow1)"/>
+              <!-- Step 6 -->
+              <rect x="775" y="30" width="120" height="80" rx="10" class="flow-box" style="stroke:var(--story1);stroke-width:2;"/>
+              <text x="835" y="62" text-anchor="middle" class="flow-text" style="font-weight:600;">자율주행 출발</text>
+              <text x="835" y="80" text-anchor="middle" class="flow-subtext">목적지 안내</text>
+              <defs>
+                <marker id="arrow1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-secondary)"/>
+                </marker>
+              </defs>
+            </svg>
+          </div>
+        </div>
+
+        <!-- System Diagram -->
+        <div class="system-section" data-reveal>
+          <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--story1)" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>시스템 개요도</h3>
+          <div class="diagram-wrap">
+            <svg width="860" height="160" viewBox="0 0 860 160" fill="none">
+              <!-- Phone -->
+              <rect x="10" y="40" width="130" height="70" rx="8" class="system-box" style="stroke:var(--story1);"/>
+              <text x="75" y="70" text-anchor="middle" class="flow-text" style="font-weight:600;">스마트폰</text>
+              <text x="75" y="88" text-anchor="middle" class="flow-subtext">갤러리</text>
+              <line x1="140" y1="75" x2="175" y2="75" class="flow-arrow" marker-end="url(#arrow1)"/>
+              <!-- IVI -->
+              <rect x="175" y="40" width="130" height="70" rx="8" class="system-box"/>
+              <text x="240" y="70" text-anchor="middle" class="flow-text" style="font-weight:600;">차량 IVI</text>
+              <text x="240" y="88" text-anchor="middle" class="flow-subtext">인포테인먼트</text>
+              <line x1="305" y1="75" x2="340" y2="75" class="flow-arrow" marker-end="url(#arrow1)"/>
+              <!-- Cloud AI -->
+              <rect x="340" y="20" width="200" height="110" rx="12" class="system-box" style="stroke:var(--story1);stroke-width:2;"/>
+              <text x="440" y="52" text-anchor="middle" class="flow-text" style="font-weight:700;fill:var(--story1);">Cloud AI Engine</text>
+              <text x="440" y="72" text-anchor="middle" class="flow-subtext">이미지 분석</text>
+              <text x="440" y="88" text-anchor="middle" class="flow-subtext">위치 추론</text>
+              <text x="440" y="104" text-anchor="middle" class="flow-subtext">POI 매칭</text>
+              <line x1="540" y1="75" x2="575" y2="75" class="flow-arrow" marker-end="url(#arrow1)"/>
+              <!-- Nav -->
+              <rect x="575" y="40" width="130" height="70" rx="8" class="system-box"/>
+              <text x="640" y="70" text-anchor="middle" class="flow-text" style="font-weight:600;">내비게이션</text>
+              <text x="640" y="88" text-anchor="middle" class="flow-subtext">경로 모듈</text>
+              <line x1="705" y1="75" x2="740" y2="75" class="flow-arrow" marker-end="url(#arrow1)"/>
+              <!-- Autonomous -->
+              <rect x="740" y="40" width="110" height="70" rx="8" class="system-box" style="stroke:var(--story1);"/>
+              <text x="795" y="70" text-anchor="middle" class="flow-text" style="font-weight:600;">자율주행</text>
+              <text x="795" y="88" text-anchor="middle" class="flow-subtext">제어 모듈</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Core Tech -->
+        <div data-reveal style="margin-bottom:48px;">
+          <h3 style="margin-bottom:16px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--story1)" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>핵심 기술</h3>
+          <div class="tech-tags">
+            <span class="tech-tag" style="border-color:var(--story1);color:var(--story1);">Vision AI 이미지 인식</span>
+            <span class="tech-tag">GPS 위치 추론</span>
+            <span class="tech-tag">자율주행 경로 생성</span>
+            <span class="tech-tag">POI 추천 엔진</span>
+          </div>
+        </div>
+
+        <!-- Comments -->
+        <div class="comments-section" data-reveal>
+          <h3 style="margin-bottom:20px;">팀원 코멘트</h3>
+          <div class="comment-grid">
+            <div class="comment-card">
+              <p class="comment-name">박준혁</p><p class="comment-role">시스템 개발</p>
+              <p class="comment-text">"IVI-클라우드 간 실시간 이미지 처리 파이프라인이 핵심입니다"</p>
+            </div>
+            <div class="comment-card">
+              <p class="comment-name">김서연</p><p class="comment-role">기능 기획</p>
+              <p class="comment-text">"사진 선택부터 출발까지 3단계 이내로 UX를 단순화해야 합니다"</p>
+            </div>
+            <div class="comment-card">
+              <p class="comment-name">이하진</p><p class="comment-role">소비자 검증</p>
+              <p class="comment-text">"30-40대 가족 단위 고객의 '추억 여행' 니즈가 매우 높습니다"</p>
+            </div>
+            <div class="comment-card">
+              <p class="comment-name">최민수</p><p class="comment-role">신기술</p>
+              <p class="comment-text">"Google Lens 수준의 장소 인식 + 자율주행 L3 이상 필요"</p>
+            </div>
+            <div class="comment-card">
+              <p class="comment-name">정유나</p><p class="comment-role">홍보 기획</p>
+              <p class="comment-text">"'사진 한 장이면 충분합니다' 캠페인으로 감성 마케팅 가능"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ========== STORY 2 ========== -->
+    <section id="story2" class="story-section" aria-label="User Story 2">
+      <div class="container">
+        <div class="story-header" data-reveal>
+          <p class="story-num" style="color:var(--story2);"><span class="accent-dot" style="background:var(--story2);"></span>USER STORY EP.02</p>
+          <h2>리콜 자가 진단 서비스</h2>
+        </div>
+
+        <div class="story-bg" data-reveal style="border-color:var(--story2);">
+          리콜 문자를 받았지만 정비소 예약하고 방문하기 번거롭다. 차에 타자마자 차량이 스스로 리콜 관련 부품을 진단하고, 위험도를 알려주며, 필요시 가까운 정비소를 자동 예약해준다.
+          <span class="customer-need">"리콜 알림을 받으면 차가 알아서 진단하고 처리해줬으면"</span>
+        </div>
+
+        <!-- Flow Diagram -->
+        <div class="flow-section" data-reveal>
+          <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--story2)" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>시나리오 플로우</h3>
+          <div class="diagram-wrap">
+            <svg width="900" height="180" viewBox="0 0 900 180" fill="none">
+              <!-- Row 1 -->
+              <rect x="5" y="20" width="115" height="70" rx="10" class="flow-box"/>
+              <text x="62" y="50" text-anchor="middle" class="flow-text">리콜 알림</text>
+              <text x="62" y="68" text-anchor="middle" class="flow-subtext">서버 수신</text>
+              <line x1="120" y1="55" x2="150" y2="55" class="flow-arrow" marker-end="url(#arrow2)"/>
+
+              <rect x="150" y="20" width="115" height="70" rx="10" class="flow-box"/>
+              <text x="207" y="50" text-anchor="middle" class="flow-text">자가 진단</text>
+              <text x="207" y="68" text-anchor="middle" class="flow-subtext">시동 시 자동실행</text>
+              <line x1="265" y1="55" x2="295" y2="55" class="flow-arrow" marker-end="url(#arrow2)"/>
+
+              <rect x="295" y="20" width="115" height="70" rx="10" class="flow-box"/>
+              <text x="352" y="50" text-anchor="middle" class="flow-text">데이터 수집</text>
+              <text x="352" y="68" text-anchor="middle" class="flow-subtext">ECU/센서</text>
+              <line x1="410" y1="55" x2="440" y2="55" class="flow-arrow" marker-end="url(#arrow2)"/>
+
+              <rect x="440" y="20" width="130" height="70" rx="10" class="flow-box" style="stroke:var(--story2);stroke-width:2;"/>
+              <text x="505" y="45" text-anchor="middle" class="flow-text" style="font-weight:600;">AI 분석</text>
+              <!-- Traffic light indicators -->
+              <circle cx="480" cy="68" r="8" fill="#10b981" opacity="0.8"/>
+              <circle cx="505" cy="68" r="8" fill="#f59e0b" opacity="0.8"/>
+              <circle cx="530" cy="68" r="8" fill="#f43f5e" opacity="0.8"/>
+              <text x="480" y="72" text-anchor="middle" style="font-size:8px;fill:white;font-weight:700;">OK</text>
+              <text x="530" y="72" text-anchor="middle" style="font-size:7px;fill:white;font-weight:700;">!</text>
+
+              <!-- Row 2 -->
+              <path d="M505 90 L505 110 L352 110 L352 120" class="flow-arrow" style="stroke:var(--story2);" marker-end="url(#arrow2)"/>
+
+              <rect x="290" y="120" width="125" height="55" rx="10" class="flow-box"/>
+              <text x="352" y="145" text-anchor="middle" class="flow-text">결과 리포트</text>
+              <text x="352" y="160" text-anchor="middle" class="flow-subtext">대시보드 표시</text>
+              <line x1="415" y1="147" x2="460" y2="147" class="flow-arrow" marker-end="url(#arrow2)"/>
+
+              <rect x="460" y="120" width="125" height="55" rx="10" class="flow-box"/>
+              <text x="522" y="145" text-anchor="middle" class="flow-text">정비소 검색</text>
+              <text x="522" y="160" text-anchor="middle" class="flow-subtext">자동 예약</text>
+              <line x1="585" y1="147" x2="630" y2="147" class="flow-arrow" marker-end="url(#arrow2)"/>
+
+              <rect x="630" y="120" width="125" height="55" rx="10" class="flow-box" style="stroke:var(--story2);stroke-width:2;"/>
+              <text x="692" y="145" text-anchor="middle" class="flow-text" style="font-weight:600;">정비 완료</text>
+              <text x="692" y="160" text-anchor="middle" class="flow-subtext">결과 업데이트</text>
+
+              <defs>
+                <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-secondary)"/>
+                </marker>
+              </defs>
+            </svg>
+          </div>
+        </div>
+
+        <!-- System Diagram -->
+        <div class="system-section" data-reveal>
+          <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--story2)" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>시스템 개요도</h3>
+          <div class="diagram-wrap">
+            <svg width="860" height="160" viewBox="0 0 860 160" fill="none">
+              <rect x="10" y="45" width="110" height="65" rx="8" class="system-box" style="stroke:var(--story2);"/>
+              <text x="65" y="72" text-anchor="middle" class="flow-text" style="font-weight:600;">리콜 서버</text>
+              <text x="65" y="90" text-anchor="middle" class="flow-subtext">관리 시스템</text>
+              <line x1="120" y1="77" x2="155" y2="77" class="flow-arrow" marker-end="url(#arrow2)"/>
+
+              <rect x="155" y="45" width="100" height="65" rx="8" class="system-box"/>
+              <text x="205" y="72" text-anchor="middle" class="flow-text" style="font-weight:600;">OTA</text>
+              <text x="205" y="90" text-anchor="middle" class="flow-subtext">모듈</text>
+              <line x1="255" y1="77" x2="290" y2="77" class="flow-arrow" marker-end="url(#arrow2)"/>
+
+              <rect x="290" y="45" width="120" height="65" rx="8" class="system-box"/>
+              <text x="350" y="72" text-anchor="middle" class="flow-text" style="font-weight:600;">ECU 진단</text>
+              <text x="350" y="90" text-anchor="middle" class="flow-subtext">모듈</text>
+              <line x1="410" y1="77" x2="445" y2="77" class="flow-arrow" marker-end="url(#arrow2)"/>
+
+              <rect x="445" y="25" width="170" height="105" rx="10" class="system-box" style="stroke:var(--story2);stroke-width:2;"/>
+              <text x="530" y="52" text-anchor="middle" class="flow-text" style="font-weight:700;fill:var(--story2);">AI 분석 엔진</text>
+              <text x="530" y="72" text-anchor="middle" class="flow-subtext">고장 예측</text>
+              <text x="530" y="88" text-anchor="middle" class="flow-subtext">위험도 평가</text>
+              <text x="530" y="104" text-anchor="middle" class="flow-subtext">OTA 패치 판단</text>
+              <line x1="615" y1="77" x2="650" y2="77" class="flow-arrow" marker-end="url(#arrow2)"/>
+
+              <rect x="650" y="45" width="100" height="65" rx="8" class="system-box"/>
+              <text x="700" y="72" text-anchor="middle" class="flow-text" style="font-weight:600;">IVI 표시</text>
+              <text x="700" y="90" text-anchor="middle" class="flow-subtext">대시보드</text>
+              <line x1="750" y1="77" x2="775" y2="77" class="flow-arrow" marker-end="url(#arrow2)"/>
+
+              <rect x="775" y="45" width="80" height="65" rx="8" class="system-box" style="stroke:var(--story2);"/>
+              <text x="815" y="72" text-anchor="middle" class="flow-text" style="font-weight:600;">정비소</text>
+              <text x="815" y="90" text-anchor="middle" class="flow-subtext">예약</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Core Tech -->
+        <div data-reveal style="margin-bottom:48px;">
+          <h3 style="margin-bottom:16px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--story2)" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09"/></svg>핵심 기술</h3>
+          <div class="tech-tags">
+            <span class="tech-tag" style="border-color:var(--story2);color:var(--story2);">OBD-II 실시간 진단</span>
+            <span class="tech-tag">AI 고장 예측</span>
+            <span class="tech-tag">OTA 리콜 패치</span>
+            <span class="tech-tag">정비소 API 연동</span>
+          </div>
+        </div>
+
+        <!-- Comments -->
+        <div class="comments-section" data-reveal>
+          <h3 style="margin-bottom:20px;">팀원 코멘트</h3>
+          <div class="comment-grid">
+            <div class="comment-card">
+              <p class="comment-name">박준혁</p><p class="comment-role">시스템 개발</p>
+              <p class="comment-text">"OBD 데이터와 리콜 DB를 매칭하는 진단 로직이 핵심"</p>
+            </div>
+            <div class="comment-card">
+              <p class="comment-name">김서연</p><p class="comment-role">기능 기획</p>
+              <p class="comment-text">"진단 결과를 신호등 색상(초록/노랑/빨강)으로 직관적 표시"</p>
+            </div>
+            <div class="comment-card">
+              <p class="comment-name">이하진</p><p class="comment-role">소비자 검증</p>
+              <p class="comment-text">"리콜 경험자 78%가 '정비소 방문이 가장 번거롭다'고 응답"</p>
+            </div>
+            <div class="comment-card">
+              <p class="comment-name">최민수</p><p class="comment-role">신기술</p>
+              <p class="comment-text">"OTA 소프트웨어 리콜은 방문 없이 즉시 패치 가능"</p>
+            </div>
+            <div class="comment-card">
+              <p class="comment-name">정유나</p><p class="comment-role">홍보 기획</p>
+              <p class="comment-text">"'당신의 차가 스스로 건강을 챙깁니다' 메시지로 신뢰 구축"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ========== STORY 3 ========== -->
+    <section id="story3" class="story-section" aria-label="User Story 3">
+      <div class="container">
+        <div class="story-header" data-reveal>
+          <p class="story-num" style="color:var(--story3);"><span class="accent-dot" style="background:var(--story3);"></span>USER STORY EP.03</p>
+          <h2>차량 집사 AI</h2>
+        </div>
+
+        <div class="story-bg" data-reveal style="border-color:var(--story3);">
+          운전 중 갑자기 타이어 경고등이 켜졌다. 당황해서 어떻게 해야 할지 모른다. 이때 차량 AI가 "타이어 공기압이 낮습니다. 500m 앞 주유소에서 충전 가능합니다. 안내해드릴까요?"라고 친절하게 안내한다.
+          <span class="customer-need">"운전 중 당황스러운 상황에서 옆에서 알려주는 사람이 있었으면"</span>
+        </div>
+
+        <!-- Flow Diagram -->
+        <div class="flow-section" data-reveal>
+          <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--story3)" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>시나리오 플로우</h3>
+          <div class="diagram-wrap">
+            <svg width="900" height="140" viewBox="0 0 900 140" fill="none">
+              <rect x="5" y="30" width="120" height="80" rx="10" class="flow-box" style="stroke:var(--negative);stroke-width:2;"/>
+              <text x="65" y="58" text-anchor="middle" class="flow-text" style="font-weight:600;">돌발 상황</text>
+              <text x="65" y="76" text-anchor="middle" class="flow-subtext">경고등/사고</text>
+              <text x="65" y="92" text-anchor="middle" class="flow-subtext">길 잃음 등</text>
+              <line x1="125" y1="70" x2="155" y2="70" class="flow-arrow" marker-end="url(#arrow3)"/>
+
+              <rect x="155" y="30" width="125" height="80" rx="10" class="flow-box"/>
+              <text x="217" y="62" text-anchor="middle" class="flow-text">상황 분석</text>
+              <text x="217" y="80" text-anchor="middle" class="flow-subtext">센서+컨텍스트</text>
+              <line x1="280" y1="70" x2="310" y2="70" class="flow-arrow" marker-end="url(#arrow3)"/>
+
+              <rect x="310" y="30" width="130" height="80" rx="10" class="flow-box" style="stroke:var(--story3);stroke-width:2;"/>
+              <text x="375" y="58" text-anchor="middle" class="flow-text" style="font-weight:600;">AI 집사 판단</text>
+              <text x="375" y="76" text-anchor="middle" class="flow-subtext">위험도 분류</text>
+              <text x="375" y="92" text-anchor="middle" class="flow-subtext">해결 방안 생성</text>
+              <line x1="440" y1="70" x2="470" y2="70" class="flow-arrow" marker-end="url(#arrow3)"/>
+
+              <rect x="470" y="30" width="130" height="80" rx="10" class="flow-box"/>
+              <text x="535" y="55" text-anchor="middle" class="flow-text">음성 안내</text>
+              <text x="535" y="73" text-anchor="middle" class="flow-subtext">원인 설명</text>
+              <text x="535" y="89" text-anchor="middle" class="flow-subtext">+ 해결 방안</text>
+              <line x1="600" y1="70" x2="630" y2="70" class="flow-arrow" marker-end="url(#arrow3)"/>
+
+              <rect x="630" y="30" width="130" height="80" rx="10" class="flow-box"/>
+              <text x="695" y="62" text-anchor="middle" class="flow-text">서비스 연결</text>
+              <text x="695" y="80" text-anchor="middle" class="flow-subtext">긴급출동/경로</text>
+              <line x1="760" y1="70" x2="790" y2="70" class="flow-arrow" marker-end="url(#arrow3)"/>
+
+              <rect x="790" y="30" width="105" height="80" rx="10" class="flow-box" style="stroke:var(--story3);stroke-width:2;"/>
+              <text x="842" y="62" text-anchor="middle" class="flow-text" style="font-weight:600;">상황 종료</text>
+              <text x="842" y="80" text-anchor="middle" class="flow-subtext">피드백 수집</text>
+
+              <defs>
+                <marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-secondary)"/>
+                </marker>
+              </defs>
+            </svg>
+          </div>
+        </div>
+
+        <!-- System Diagram -->
+        <div class="system-section" data-reveal>
+          <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--story3)" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>시스템 개요도</h3>
+          <div class="diagram-wrap">
+            <svg width="860" height="170" viewBox="0 0 860 170" fill="none">
+              <!-- Sensor Array -->
+              <rect x="10" y="25" width="140" height="120" rx="10" class="system-box" style="stroke:var(--story3);"/>
+              <text x="80" y="50" text-anchor="middle" class="flow-text" style="font-weight:700;fill:var(--story3);">센서 어레이</text>
+              <text x="80" y="72" text-anchor="middle" class="flow-subtext">카메라</text>
+              <text x="80" y="88" text-anchor="middle" class="flow-subtext">라이다</text>
+              <text x="80" y="104" text-anchor="middle" class="flow-subtext">OBD</text>
+              <text x="80" y="120" text-anchor="middle" class="flow-subtext">마이크</text>
+              <line x1="150" y1="85" x2="190" y2="85" class="flow-arrow" marker-end="url(#arrow3)"/>
+
+              <!-- Edge AI -->
+              <rect x="190" y="35" width="160" height="100" rx="10" class="system-box" style="stroke:var(--story3);stroke-width:2;"/>
+              <text x="270" y="60" text-anchor="middle" class="flow-text" style="font-weight:700;">Edge AI</text>
+              <text x="270" y="80" text-anchor="middle" class="flow-subtext">상황 인지</text>
+              <text x="270" y="96" text-anchor="middle" class="flow-subtext">위험도 분류</text>
+              <text x="270" y="112" text-anchor="middle" class="flow-subtext">실시간 처리</text>
+              <line x1="350" y1="85" x2="390" y2="85" class="flow-arrow" marker-end="url(#arrow3)"/>
+
+              <!-- LLM Engine -->
+              <rect x="390" y="25" width="170" height="120" rx="10" class="system-box" style="stroke:var(--story3);stroke-width:2;"/>
+              <text x="475" y="50" text-anchor="middle" class="flow-text" style="font-weight:700;fill:var(--story3);">LLM 대화 엔진</text>
+              <text x="475" y="72" text-anchor="middle" class="flow-subtext">자연어 생성</text>
+              <text x="475" y="88" text-anchor="middle" class="flow-subtext">감정 인식</text>
+              <text x="475" y="104" text-anchor="middle" class="flow-subtext">매뉴얼 RAG</text>
+              <text x="475" y="120" text-anchor="middle" class="flow-subtext">3가지 톤 모드</text>
+              <line x1="560" y1="85" x2="600" y2="85" class="flow-arrow" marker-end="url(#arrow3)"/>
+
+              <!-- Output -->
+              <rect x="600" y="45" width="110" height="80" rx="8" class="system-box"/>
+              <text x="655" y="72" text-anchor="middle" class="flow-text" style="font-weight:600;">음성 출력</text>
+              <text x="655" y="90" text-anchor="middle" class="flow-subtext">+ HUD 표시</text>
+              <line x1="710" y1="85" x2="740" y2="85" class="flow-arrow" marker-end="url(#arrow3)"/>
+
+              <!-- External -->
+              <rect x="740" y="30" width="110" height="110" rx="8" class="system-box" style="stroke:var(--story3);"/>
+              <text x="795" y="55" text-anchor="middle" class="flow-text" style="font-weight:600;">외부 연동</text>
+              <text x="795" y="77" text-anchor="middle" class="flow-subtext">긴급출동</text>
+              <text x="795" y="93" text-anchor="middle" class="flow-subtext">정비소</text>
+              <text x="795" y="109" text-anchor="middle" class="flow-subtext">보험사</text>
+              <text x="795" y="125" text-anchor="middle" class="flow-subtext">V2X 통신</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Core Tech -->
+        <div data-reveal style="margin-bottom:48px;">
+          <h3 style="margin-bottom:16px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--story3)" stroke-width="2" style="vertical-align:middle;margin-right:8px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09"/></svg>핵심 기술</h3>
+          <div class="tech-tags">
+            <span class="tech-tag" style="border-color:var(--story3);color:var(--story3);">멀티모달 상황 인지</span>
+            <span class="tech-tag">LLM 대화형 AI</span>
+            <span class="tech-tag">V2X 실시간 통신</span>
+            <span class="tech-tag">긴급 서비스 연동</span>
+          </div>
+        </div>
+
+        <!-- Comments -->
+        <div class="comments-section" data-reveal>
+          <h3 style="margin-bottom:20px;">팀원 코멘트</h3>
+          <div class="comment-grid">
+            <div class="comment-card">
+              <p class="comment-name">박준혁</p><p class="comment-role">시스템 개발</p>
+              <p class="comment-text">"Edge AI와 클라우드 하이브리드로 응답 지연 1초 이내 목표"</p>
+            </div>
+            <div class="comment-card">
+              <p class="comment-name">김서연</p><p class="comment-role">기능 기획</p>
+              <p class="comment-text">"집사 AI의 말투와 톤을 3가지(차분/긴급/유머) 모드로 설계"</p>
+            </div>
+            <div class="comment-card">
+              <p class="comment-name">이하진</p><p class="comment-role">소비자 검증</p>
+              <p class="comment-text">"초보 운전자의 92%가 '경고등 의미를 모른다'고 답변"</p>
+            </div>
+            <div class="comment-card">
+              <p class="comment-name">최민수</p><p class="comment-role">신기술</p>
+              <p class="comment-text">"GPT 수준 LLM + 차량 매뉴얼 RAG로 정확한 안내 가능"</p>
+            </div>
+            <div class="comment-card">
+              <p class="comment-name">정유나</p><p class="comment-role">홍보 기획</p>
+              <p class="comment-text">"'당신의 차가 말을 겁니다' 바이럴 영상 캠페인 기획"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ========== ROADMAP ========== -->
+    <section id="roadmap" class="roadmap-section" aria-label="Roadmap">
+      <div class="container">
+        <div class="story-header" data-reveal>
+          <p class="story-num" style="color:var(--accent);">IMPLEMENTATION ROADMAP</p>
+          <h2>종합 로드맵 &amp; 기대효과</h2>
+          <p class="text-secondary" style="margin-top:8px;">3편의 유저 스토리는 AI 엔진, 클라우드 인프라, 자율주행을 공통 기반으로 공유합니다.</p>
+        </div>
+
+        <!-- Tech Convergence Diagram -->
+        <div class="diagram-wrap" data-reveal style="margin-bottom:48px;">
+          <svg width="700" height="280" viewBox="0 0 700 280" fill="none" style="display:block;margin:0 auto;">
+            <!-- Central Hub -->
+            <circle cx="350" cy="140" r="60" fill="none" stroke="var(--accent)" stroke-width="2" opacity="0.6"/>
+            <text x="350" y="130" text-anchor="middle" class="flow-text" style="font-weight:700;fill:var(--accent);font-size:13px;">공통 기반</text>
+            <text x="350" y="148" text-anchor="middle" class="flow-subtext" style="font-size:11px;">AI + Cloud</text>
+            <text x="350" y="163" text-anchor="middle" class="flow-subtext" style="font-size:11px;">+ 자율주행</text>
+
+            <!-- Story 1 -->
+            <circle cx="150" cy="80" r="50" fill="none" stroke="var(--story1)" stroke-width="2"/>
+            <text x="150" y="73" text-anchor="middle" class="flow-text" style="font-weight:600;fill:var(--story1);font-size:12px;">EP.01</text>
+            <text x="150" y="90" text-anchor="middle" class="flow-subtext" style="font-size:10px;">추억 여행</text>
+            <line x1="195" y1="100" x2="295" y2="125" stroke="var(--story1)" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
+
+            <!-- Story 2 -->
+            <circle cx="150" cy="210" r="50" fill="none" stroke="var(--story2)" stroke-width="2"/>
+            <text x="150" y="203" text-anchor="middle" class="flow-text" style="font-weight:600;fill:var(--story2);font-size:12px;">EP.02</text>
+            <text x="150" y="220" text-anchor="middle" class="flow-subtext" style="font-size:10px;">자가 진단</text>
+            <line x1="195" y1="195" x2="295" y2="155" stroke="var(--story2)" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
+
+            <!-- Story 3 -->
+            <circle cx="550" cy="140" r="50" fill="none" stroke="var(--story3)" stroke-width="2"/>
+            <text x="550" y="133" text-anchor="middle" class="flow-text" style="font-weight:600;fill:var(--story3);font-size:12px;">EP.03</text>
+            <text x="550" y="150" text-anchor="middle" class="flow-subtext" style="font-size:10px;">집사 AI</text>
+            <line x1="505" y1="140" x2="410" y2="140" stroke="var(--story3)" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
+
+            <!-- Tech labels -->
+            <text x="350" y="30" text-anchor="middle" class="flow-subtext" style="font-size:11px;fill:var(--accent);font-weight:500;">Vision AI</text>
+            <text x="480" y="60" text-anchor="middle" class="flow-subtext" style="font-size:11px;fill:var(--accent);font-weight:500;">LLM</text>
+            <text x="480" y="230" text-anchor="middle" class="flow-subtext" style="font-size:11px;fill:var(--accent);font-weight:500;">OTA</text>
+            <text x="350" y="260" text-anchor="middle" class="flow-subtext" style="font-size:11px;fill:var(--accent);font-weight:500;">V2X 통신</text>
+            <text x="230" y="55" text-anchor="middle" class="flow-subtext" style="font-size:11px;fill:var(--accent);font-weight:500;">경로 생성</text>
+            <text x="230" y="250" text-anchor="middle" class="flow-subtext" style="font-size:11px;fill:var(--accent);font-weight:500;">ECU 진단</text>
+          </svg>
+        </div>
+
+        <!-- Timeline -->
+        <h3 data-reveal style="margin-bottom:32px;">구현 타임라인</h3>
+        <div class="timeline-wrap" data-reveal>
+          <div class="timeline-line"></div>
+          <div class="timeline-items">
+            <div class="timeline-item">
+              <div class="timeline-content">
+                <div class="card">
+                  <p class="timeline-year" style="color:var(--accent);">2026 하반기</p>
+                  <p class="timeline-desc">컨셉 검증 (PoC) 및 고객 니즈 리서치 완료. 핵심 AI 모델 프로토타이핑.</p>
+                </div>
+              </div>
+              <div class="timeline-dot" style="background:var(--accent);">1</div>
+              <div class="timeline-content" style="visibility:hidden;"></div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-content" style="visibility:hidden;"></div>
+              <div class="timeline-dot" style="background:var(--story1);">2</div>
+              <div class="timeline-content">
+                <div class="card">
+                  <p class="timeline-year" style="color:var(--story1);">2027 상반기</p>
+                  <p class="timeline-desc">프로토타입 개발. 차량 시뮬레이터 기반 유저 테스트 및 피드백 반영.</p>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-content">
+                <div class="card">
+                  <p class="timeline-year" style="color:var(--story2);">2027 하반기</p>
+                  <p class="timeline-desc">실차 테스트 및 소비자 검증. OTA 인프라 구축 및 정비소 API 연동.</p>
+                </div>
+              </div>
+              <div class="timeline-dot" style="background:var(--story2);">3</div>
+              <div class="timeline-content" style="visibility:hidden;"></div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-content" style="visibility:hidden;"></div>
+              <div class="timeline-dot" style="background:var(--story3);">4</div>
+              <div class="timeline-content">
+                <div class="card">
+                  <p class="timeline-year" style="color:var(--story3);">2028</p>
+                  <p class="timeline-desc">양산 적용 및 상용화. 신차 라인업에 순차적 탑재, 마케팅 캠페인 론칭.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expected Effects -->
+        <h3 data-reveal style="margin-top:64px; margin-bottom:12px;">기대효과</h3>
+        <div class="effect-grid" data-reveal>
+          <div class="card effect-card">
+            <div class="effect-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--positive)" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </div>
+            <h4>고객 만족도 향상</h4>
+            <p>고객의 실제 불편과 니즈를 해결하는 기술 서비스로 브랜드 충성도 극대화</p>
+          </div>
+          <div class="card effect-card">
+            <div class="effect-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            </div>
+            <h4>기술 리더십 확보</h4>
+            <p>AI + 자율주행 + V2X 융합 기술로 미래 모빌리티 시장 선도</p>
+          </div>
+          <div class="card effect-card">
+            <div class="effect-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            </div>
+            <h4>서비스 수익 모델</h4>
+            <p>정비 연동, AI 구독, 여행 파트너십 등 새로운 수익원 창출</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="container">
+        <p>미래 모빌리티 유저 스토리 기획안 | 컨셉 기획팀 | 2026년 3월</p>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    // === Menu ===
+    function toggleMenu() {
+      var dropdown = document.getElementById('vizMenuDropdown');
+      if (dropdown) dropdown.classList.toggle('open');
+    }
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.viz-menu')) {
+        var dropdown = document.getElementById('vizMenuDropdown');
+        if (dropdown) dropdown.classList.remove('open');
+      }
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        var dropdown = document.getElementById('vizMenuDropdown');
+        if (dropdown) dropdown.classList.remove('open');
+      }
+    });
+
+    // === Theme ===
+    var savedTheme = localStorage.getItem('viz-theme');
+    var currentTheme = savedTheme || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    function applyTheme(t) {
+      document.documentElement.className = 'theme-' + t;
+      var icon = document.getElementById('themeIcon');
+      var label = document.getElementById('themeLabel');
+      if (icon) icon.textContent = t === 'dark' ? '\u{1F319}' : '\u2600\uFE0F';
+      if (label) label.textContent = t === 'dark' ? 'Dark' : 'Light';
+      localStorage.setItem('viz-theme', t);
+      currentTheme = t;
+      if (typeof onThemeChange === 'function') onThemeChange();
+    }
+    function cycleTheme() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); }
+    applyTheme(currentTheme);
+
+    // === Scroll Reveal ===
+    document.querySelectorAll('[data-reveal]').forEach(function(el) { el.classList.add('reveal'); });
+    var revealObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (e.isIntersecting) { e.target.classList.add('visible'); revealObserver.unobserve(e.target); }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(function(el) { revealObserver.observe(el); });
+
+    // === Number Counter ===
+    function animateCounters() {
+      document.querySelectorAll('[data-count]').forEach(function(el) {
+        if (el.dataset.counted) return;
+        el.dataset.counted = '1';
+        var target = parseFloat(el.dataset.count), prefix = el.dataset.prefix || '', suffix = el.dataset.suffix || '';
+        var start = performance.now(), duration = 1200;
+        (function tick(now) {
+          var p = Math.min((now - start) / duration, 1), eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = prefix + Math.round(target * eased).toLocaleString() + suffix;
+          if (p < 1) requestAnimationFrame(tick);
+        })(start);
+      });
+    }
+    var counterEl = document.querySelector('[data-count]');
+    if (counterEl) {
+      var cObs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) { if (e.isIntersecting) { animateCounters(); cObs.disconnect(); } });
+      }, { threshold: 0.3 });
+      cObs.observe(counterEl);
+    }
+
+    // === Scroll Navigation ===
+    function scrollToSection(id) {
+      var el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // === Download PNG ===
+    async function downloadImage() {
+      var menu = document.querySelector('.viz-menu');
+      menu.style.display = 'none';
+      try {
+        var url = await htmlToImage.toPng(document.body, {
+          quality: 1, pixelRatio: 2,
+          filter: function(n) { return !n.classList || !n.classList.contains('viz-menu'); }
+        });
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'future-mobility-user-story.png';
+        a.click();
+      } catch(e) { console.error('Download failed:', e); }
+      menu.style.display = '';
+    }
+
+    // === Theme change hook ===
+    function onThemeChange() {}
+  </script>
+</body>
+</html>

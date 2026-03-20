@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Story Map</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f4f6f9; --surface: #ffffff; --surface-alt: #f8fafc;
+      --border: #e2e8f0; --border-focus: #3b82f6;
+      --text: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8;
+      --accent: #3b82f6; --accent-light: #eff6ff;
+      --cat-fn: #059669; --cat-fn-bg: #ecfdf5; --cat-fn-border: #a7f3d0;
+      --cat-spec: #2563eb; --cat-spec-bg: #eff6ff; --cat-spec-border: #bfdbfe;
+      --cat-svc: #d97706; --cat-svc-bg: #fffbeb; --cat-svc-border: #fde68a;
+      --cat-biz: #7c3aed; --cat-biz-bg: #f5f3ff; --cat-biz-border: #ddd6fe;
+      --stage-bg: #1e3a5f; --stage-text: #ffffff;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .dark {
+      --bg: #0f172a; --surface: #1e293b; --surface-alt: #1e293b;
+      --border: #334155; --border-focus: #60a5fa;
+      --text: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #475569;
+      --accent: #60a5fa; --accent-light: rgba(96,165,250,0.1);
+      --cat-fn-bg: rgba(5,150,105,0.12); --cat-fn-border: rgba(5,150,105,0.3);
+      --cat-spec-bg: rgba(37,99,235,0.12); --cat-spec-border: rgba(37,99,235,0.3);
+      --cat-svc-bg: rgba(217,119,6,0.12); --cat-svc-border: rgba(217,119,6,0.3);
+      --cat-biz-bg: rgba(124,58,237,0.12); --cat-biz-border: rgba(124,58,237,0.3);
+      --stage-bg: #0f2847; --shadow: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); }
+
+    /* === TOOLBAR === */
+    .toolbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 10px 24px; display: flex; align-items: center; gap: 12px;
+      box-shadow: var(--shadow);
+    }
+    .toolbar h1 { font-size: 1rem; font-weight: 700; margin-right: auto; }
+    .toolbar .author-input {
+      padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--text); font-family: inherit; font-size: 0.85rem;
+      width: 120px;
+    }
+    .toolbar .author-input:focus { outline: none; border-color: var(--border-focus); }
+    .tb {
+      padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text); font-family: inherit;
+      font-size: 0.8rem; cursor: pointer; font-weight: 500; transition: all 0.15s;
+    }
+    .tb:hover { background: var(--surface-alt); }
+    .tb-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .tb-primary:hover { opacity: 0.9; }
+    .tb-icon { padding: 7px 10px; font-size: 1rem; line-height: 1; }
+
+    /* === CANVAS (PPT-like area) === */
+    .canvas-wrap { padding: 24px; overflow-x: auto; }
+    .canvas {
+      min-width: 900px; max-width: 1400px; margin: 0 auto;
+      background: var(--surface); border-radius: 12px; border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg); overflow: hidden;
+    }
+
+    /* Title bar */
+    .canvas-title {
+      background: var(--stage-bg); color: var(--stage-text); padding: 16px 24px;
+      font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 12px;
+    }
+    .canvas-title input {
+      background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.2);
+      color: var(--stage-text); font-family: inherit; font-size: 1.1rem; font-weight: 700;
+      flex: 1; padding: 2px 0;
+    }
+    .canvas-title input:focus { outline: none; border-bottom-color: rgba(255,255,255,0.6); }
+    .canvas-title input::placeholder { color: rgba(255,255,255,0.4); }
+
+    /* === STAGE FLOW ROW === */
+    .stage-row {
+      display: flex; align-items: stretch; padding: 16px 20px; gap: 0;
+      border-bottom: 1px solid var(--border); background: var(--surface-alt);
+    }
+    .stage-row-label {
+      width: 90px; min-width: 90px; display: flex; align-items: center;
+      font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .stage-flow { display: flex; align-items: center; gap: 0; flex: 1; overflow-x: auto; }
+    .stage-box {
+      flex: 1; min-width: 130px; max-width: 260px;
+      background: var(--stage-bg); color: var(--stage-text);
+      border-radius: 8px; padding: 10px 14px; text-align: center;
+      font-weight: 600; font-size: 0.9rem; position: relative;
+      cursor: text; transition: box-shadow 0.15s;
+    }
+    .stage-box:hover { box-shadow: 0 0 0 2px var(--accent); }
+    .stage-box input {
+      width: 100%; background: transparent; border: none; color: var(--stage-text);
+      font-family: inherit; font-size: 0.9rem; font-weight: 600; text-align: center;
+    }
+    .stage-box input:focus { outline: none; }
+    .stage-box input::placeholder { color: rgba(255,255,255,0.4); }
+    .stage-box .stage-delete {
+      position: absolute; top: -6px; right: -6px; width: 18px; height: 18px;
+      border-radius: 50%; background: #ef4444; color: #fff; border: none;
+      font-size: 10px; cursor: pointer; display: none; align-items: center;
+      justify-content: center; line-height: 1;
+    }
+    .stage-box:hover .stage-delete { display: flex; }
+    .stage-arrow {
+      width: 36px; min-width: 36px; display: flex; align-items: center;
+      justify-content: center; color: var(--text-muted); font-size: 1.3rem;
+    }
+    .stage-add-btn {
+      min-width: 40px; height: 40px; border-radius: 8px; border: 2px dashed var(--border);
+      background: transparent; color: var(--text-muted); font-size: 1.2rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s; margin-left: 4px;
+    }
+    .stage-add-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+    /* === USER STORY ROW === */
+    .story-row {
+      display: flex; border-bottom: 1px solid var(--border); min-height: 80px;
+    }
+    .story-row-label {
+      width: 90px; min-width: 90px; padding: 12px;
+      font-size: 0.7rem; font-weight: 600; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      border-right: 1px solid var(--border); background: var(--surface-alt);
+      display: flex; align-items: flex-start; padding-top: 14px;
+    }
+    .story-cols { display: flex; flex: 1; }
+    .story-col {
+      flex: 1; min-width: 130px; padding: 10px; border-right: 1px solid var(--border);
+      position: relative; cursor: pointer; transition: background 0.1s;
+    }
+    .story-col:last-child { border-right: none; }
+    .story-col:hover { background: var(--accent-light); }
+    .story-item {
+      font-size: 0.8rem; color: var(--text); padding: 4px 6px; margin-bottom: 4px;
+      border-radius: 4px; display: flex; align-items: flex-start; gap: 4px;
+      line-height: 1.4;
+    }
+    .story-item::before { content: "•"; color: var(--accent); font-weight: bold; flex-shrink: 0; margin-top: 1px; }
+    .story-item .del-x {
+      opacity: 0; cursor: pointer; color: #ef4444; font-size: 0.7rem; margin-left: auto;
+      flex-shrink: 0; padding: 0 2px; transition: opacity 0.1s;
+    }
+    .story-item:hover .del-x { opacity: 1; }
+    .story-col .add-hint {
+      font-size: 0.75rem; color: var(--text-muted); padding: 4px 6px;
+      opacity: 0; transition: opacity 0.15s;
+    }
+    .story-col:hover .add-hint { opacity: 1; }
+
+    /* === ELEMENTS TABLE === */
+    .elements-section { border-bottom: 1px solid var(--border); }
+    .elements-header {
+      display: flex; background: var(--surface-alt); border-bottom: 1px solid var(--border);
+    }
+    .elements-header-label {
+      width: 90px; min-width: 90px; padding: 10px 12px; font-size: 0.7rem;
+      font-weight: 600; color: var(--text-secondary); text-transform: uppercase;
+      letter-spacing: 0.05em; border-right: 1px solid var(--border);
+      display: flex; align-items: center;
+    }
+    .elements-header-cols { display: flex; flex: 1; }
+    .elements-header-col {
+      flex: 1; min-width: 130px; padding: 8px 10px; text-align: center;
+      font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);
+      border-right: 1px solid var(--border);
+    }
+    .elements-header-col:last-child { border-right: none; }
+
+    .cat-row { display: flex; border-bottom: 1px solid var(--border); min-height: 56px; }
+    .cat-row:last-child { border-bottom: none; }
+    .cat-label-cell {
+      width: 90px; min-width: 90px; padding: 10px 8px;
+      font-size: 0.8rem; font-weight: 700; text-align: center;
+      border-right: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cat-cells { display: flex; flex: 1; }
+    .cat-cell {
+      flex: 1; min-width: 130px; padding: 8px; border-right: 1px solid var(--border);
+      cursor: pointer; transition: background 0.1s; position: relative;
+    }
+    .cat-cell:last-child { border-right: none; }
+    .cat-cell:hover { background: var(--accent-light); }
+    .cat-item {
+      font-size: 0.78rem; padding: 3px 6px; margin-bottom: 3px; border-radius: 3px;
+      display: flex; align-items: center; gap: 4px; line-height: 1.4;
+    }
+    .cat-item .del-x {
+      opacity: 0; cursor: pointer; color: #ef4444; font-size: 0.65rem; margin-left: auto;
+      flex-shrink: 0; transition: opacity 0.1s;
+    }
+    .cat-item:hover .del-x { opacity: 1; }
+    .cat-cell .add-hint {
+      font-size: 0.7rem; color: var(--text-muted); padding: 3px 6px;
+      opacity: 0; transition: opacity 0.15s;
+    }
+    .cat-cell:hover .add-hint { opacity: 1; }
+
+    /* Category colors */
+    .cat-fn .cat-label-cell { color: var(--cat-fn); background: var(--cat-fn-bg); border-left: 3px solid var(--cat-fn); }
+    .cat-spec .cat-label-cell { color: var(--cat-spec); background: var(--cat-spec-bg); border-left: 3px solid var(--cat-spec); }
+    .cat-svc .cat-label-cell { color: var(--cat-svc); background: var(--cat-svc-bg); border-left: 3px solid var(--cat-svc); }
+    .cat-biz .cat-label-cell { color: var(--cat-biz); background: var(--cat-biz-bg); border-left: 3px solid var(--cat-biz); }
+    .cat-fn .cat-cell { background: var(--cat-fn-bg); }
+    .cat-spec .cat-cell { background: var(--cat-spec-bg); }
+    .cat-svc .cat-cell { background: var(--cat-svc-bg); }
+    .cat-biz .cat-cell { background: var(--cat-biz-bg); }
+
+    /* === INLINE INPUT MODAL === */
+    .inline-modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3);
+      z-index: 200; align-items: center; justify-content: center;
+    }
+    .inline-modal-overlay.open { display: flex; }
+    .inline-modal {
+      background: var(--surface); border-radius: 12px; padding: 20px;
+      width: 400px; max-width: 90vw; box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+    }
+    .inline-modal h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 14px; }
+    .inline-modal .field { margin-bottom: 10px; }
+    .inline-modal .field label { display: block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 3px; font-weight: 500; }
+    .inline-modal .field input,
+    .inline-modal .field textarea {
+      width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--text); font-family: inherit; font-size: 0.85rem;
+    }
+    .inline-modal .field textarea { min-height: 60px; resize: vertical; }
+    .inline-modal .field input:focus, .inline-modal .field textarea:focus {
+      outline: none; border-color: var(--border-focus);
+    }
+    .inline-modal .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+
+    /* === STATUS BAR === */
+    .status-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--surface); border-top: 1px solid var(--border);
+      padding: 6px 24px; font-size: 0.75rem; color: var(--text-secondary);
+      display: flex; align-items: center; gap: 16px; z-index: 100;
+    }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cat-fn); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    @media (max-width: 768px) {
+      .toolbar { flex-wrap: wrap; }
+      .canvas-wrap { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <h1>User Story Map</h1>
+    <label style="font-size:0.8rem;color:var(--text-secondary);">작성자:</label>
+    <input class="author-input" id="globalAuthor" placeholder="이름 입력" value="">
+    <button class="tb" onclick="runGrouping()">유사항목 정리</button>
+    <button class="tb tb-primary" onclick="exportPPT()">PPT 내보내기</button>
+    <button class="tb tb-icon" onclick="toggleDark()" title="테마 전환">&#9681;</button>
+  </div>
+
+  <!-- Main Canvas -->
+  <div class="canvas-wrap">
+    <div class="canvas" id="canvas">
+      <!-- Title -->
+      <div class="canvas-title">
+        <span>&#9670;</span>
+        <input id="mapTitle" value="User Story Map" placeholder="제목을 입력하세요">
+      </div>
+
+      <!-- Stage Row -->
+      <div class="stage-row">
+        <div class="stage-row-label">단계</div>
+        <div class="stage-flow" id="stageFlow"></div>
+      </div>
+
+      <!-- User Story Row -->
+      <div class="story-row">
+        <div class="story-row-label">User<br>Story</div>
+        <div class="story-cols" id="storyCols"></div>
+      </div>
+
+      <!-- Elements Section -->
+      <div class="elements-section">
+        <div class="elements-header">
+          <div class="elements-header-label">경험 구현<br>요소</div>
+          <div class="elements-header-cols" id="elemHeaderCols"></div>
+        </div>
+        <div id="catRows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inline Input Modal -->
+  <div class="inline-modal-overlay" id="modalOverlay">
+    <div class="inline-modal" id="modal">
+      <h3 id="modalTitle">항목 추가</h3>
+      <div class="field">
+        <label id="modalFieldLabel">내용</label>
+        <textarea id="modalInput" placeholder="입력하세요..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="tb" onclick="closeModal()">취소</button>
+        <button class="tb tb-primary" onclick="submitModal()">추가</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-dot"></span>
+    <span id="statusText">Ready</span>
+    <span style="margin-left:auto;" id="itemCountStatus">0 items</span>
+  </div>
+
+  <script>
+    const API = '/api';
+    let stages = [];
+    let items = [];
+
+    // Modal state
+    let modalCallback = null;
+
+    // ===================== API =====================
+    async function api(method, path, body = null) {
+      const opts = { method, headers: { 'Content-Type': 'application/json' } };
+      if (body) opts.body = JSON.stringify(body);
+      const res = await fetch(API + path, opts);
+      if (!res.ok) throw new Error(`API ${res.status}`);
+      return res.json();
+    }
+
+    // ===================== DATA =====================
+    async function loadAll() {
+      [stages, items] = await Promise.all([
+        api('GET', '/stages'),
+        api('GET', '/items'),
+      ]);
+      render();
+    }
+
+    function getAuthor() {
+      return document.getElementById('globalAuthor').value.trim() || '익명';
+    }
+
+    function itemsForStage(stageId) {
+      return items.filter(it => it.stage_id === stageId);
+    }
+
+    function storiesForStage(stageId) {
+      const si = itemsForStage(stageId);
+      // unique story texts
+      const seen = new Set();
+      return si.filter(it => {
+        if (seen.has(it.text)) return false;
+        seen.add(it.text);
+        return true;
+      });
+    }
+
+    function elementsForCell(stageId, category) {
+      return items.filter(it => it.stage_id === stageId && it.category === category);
+    }
+
+    // ===================== RENDER =====================
+    function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    function render() {
+      renderStageFlow();
+      renderStoryRow();
+      renderElementsHeader();
+      renderCatRows();
+      updateStatus();
+    }
+
+    function renderStageFlow() {
+      const el = document.getElementById('stageFlow');
+      let html = '';
+      stages.forEach((s, i) => {
+        if (i > 0) html += '<div class="stage-arrow">\u2192</div>';
+        html += `<div class="stage-box" data-sid="${s.id}">
+          <input value="${esc(s.title)}" placeholder="단계명..."
+                 onchange="renameStage(${s.id}, this.value)"
+                 onkeydown="if(event.key==='Enter')this.blur()">
+          <button class="stage-delete" onclick="deleteStage(${s.id})" title="삭제">\u2715</button>
+        </div>`;
+      });
+      html += `<div class="stage-arrow" style="width:12px;"></div>`;
+      html += `<button class="stage-add-btn" onclick="addStage()" title="단계 추가">+</button>`;
+      el.innerHTML = html;
+    }
+
+    function renderStoryRow() {
+      const el = document.getElementById('storyCols');
+      let html = '';
+      stages.forEach(s => {
+        const stories = storiesForStage(s.id);
+        html += `<div class="story-col" onclick="openStoryModal(${s.id})">`;
+        if (stories.length === 0) {
+          html += `<div class="add-hint">+ 클릭하여 스토리 추가</div>`;
+        } else {
+          stories.forEach(it => {
+            html += `<div class="story-item">
+              <span>${esc(it.text)}</span>
+              <span class="del-x" onclick="event.stopPropagation();deleteItem('${it.id}')">\u2715</span>
+            </div>`;
+          });
+          html += `<div class="add-hint">+ 추가</div>`;
+        }
+        html += '</div>';
+      });
+      el.innerHTML = html;
+    }
+
+    function renderElementsHeader() {
+      const el = document.getElementById('elemHeaderCols');
+      el.innerHTML = stages.map(s =>
+        `<div class="elements-header-col">${esc(s.title)}</div>`
+      ).join('');
+    }
+
+    function renderCatRows() {
+      const cats = [
+        { key: '기능', cls: 'cat-fn', label: '기능' },
+        { key: '사양', cls: 'cat-spec', label: '사양' },
+        { key: '서비스', cls: 'cat-svc', label: '서비스' },
+        { key: '사업요소', cls: 'cat-biz', label: '사업요소' },
+      ];
+      const el = document.getElementById('catRows');
+      let html = '';
+      cats.forEach(cat => {
+        html += `<div class="cat-row ${cat.cls}">`;
+        html += `<div class="cat-label-cell">${cat.label}</div>`;
+        html += `<div class="cat-cells">`;
+        stages.forEach(s => {
+          const elems = elementsForCell(s.id, cat.key);
+          html += `<div class="cat-cell" onclick="openElementModal(${s.id},'${cat.key}')">`;
+          if (elems.length === 0) {
+            html += `<div class="add-hint">+ 클릭하여 추가</div>`;
+          } else {
+            elems.forEach(it => {
+              html += `<div class="cat-item">
+                <span>${esc(it.category_item)}</span>
+                <span class="del-x" onclick="event.stopPropagation();deleteItem('${it.id}')">\u2715</span>
+              </div>`;
+            });
+            html += `<div class="add-hint">+ 추가</div>`;
+          }
+          html += '</div>';
+        });
+        html += '</div></div>';
+      });
+      el.innerHTML = html;
+    }
+
+    function updateStatus() {
+      document.getElementById('itemCountStatus').textContent = `${items.length} items \u00b7 ${stages.length} stages`;
+    }
+
+    function setStatus(msg) {
+      document.getElementById('statusText').textContent = msg;
+      setTimeout(() => { document.getElementById('statusText').textContent = 'Ready'; }, 3000);
+    }
+
+    // ===================== STAGE ACTIONS =====================
+    async function addStage() {
+      const num = stages.length + 1;
+      await api('POST', '/stages', { title: `단계 ${num}` });
+      await loadAll();
+      setStatus('단계가 추가되었습니다.');
+    }
+
+    async function renameStage(id, newTitle) {
+      if (!newTitle.trim()) return;
+      await api('PUT', `/stages/${id}`, { title: newTitle.trim() });
+      await loadAll();
+    }
+
+    async function deleteStage(id) {
+      // 해당 단계의 items도 삭제
+      const toDelete = items.filter(it => it.stage_id === id);
+      for (const it of toDelete) {
+        await api('DELETE', `/items/${it.id}`);
+      }
+      await api('DELETE', `/stages/${id}`);
+      await loadAll();
+      setStatus('단계가 삭제되었습니다.');
+    }
+
+    // ===================== MODAL =====================
+    function openModal(title, label, placeholder, callback) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalFieldLabel').textContent = label;
+      const input = document.getElementById('modalInput');
+      input.placeholder = placeholder;
+      input.value = '';
+      modalCallback = callback;
+      document.getElementById('modalOverlay').classList.add('open');
+      setTimeout(() => input.focus(), 50);
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      modalCallback = null;
+    }
+
+    async function submitModal() {
+      const val = document.getElementById('modalInput').value.trim();
+      if (!val || !modalCallback) return;
+      await modalCallback(val);
+      closeModal();
+      await loadAll();
+    }
+
+    // Handle Enter to submit, Escape to close
+    document.getElementById('modalInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitModal(); }
+      if (e.key === 'Escape') closeModal();
+    });
+    document.getElementById('modalOverlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeModal();
+    });
+
+    function openStoryModal(stageId) {
+      const stage = stages.find(s => s.id === stageId);
+      openModal(
+        `"${stage.title}" - 유저스토리 추가`,
+        '유저스토리',
+        '예: 구찌 매장에 가까운 엘리베이터 주변으로 주차 공간 선택된다',
+        async (text) => {
+          await api('POST', '/items', {
+            author: getAuthor(),
+            stage_id: stageId,
+            text: text,
+            category: '기능',
+            category_item: '-',
+          });
+        }
+      );
+    }
+
+    function openElementModal(stageId, category) {
+      const stage = stages.find(s => s.id === stageId);
+      const catNames = { '기능': '기능', '사양': '사양', '서비스': '서비스', '사업요소': '사업요소' };
+      openModal(
+        `"${stage.title}" - ${catNames[category]} 추가`,
+        `${catNames[category]} 항목`,
+        '예: 자율주행, 실내 주차장 지도, 주차 결제 등',
+        async (text) => {
+          await api('POST', '/items', {
+            author: getAuthor(),
+            stage_id: stageId,
+            text: `${stage.title} - ${catNames[category]}`,
+            category: category,
+            category_item: text,
+          });
+        }
+      );
+    }
+
+    // ===================== ITEM ACTIONS =====================
+    async function deleteItem(id) {
+      await api('DELETE', `/items/${id}`);
+      await loadAll();
+    }
+
+    // ===================== GROUPING =====================
+    async function runGrouping() {
+      setStatus('유사 항목 정리 중...');
+      try {
+        const result = await api('POST', '/group');
+        // result에서 병합된 결과를 items로 반영 (기존 items 삭제 후 재구성)
+        // 현재는 서버에서 그룹핑 결과만 리턴하므로, 기존 items를 정리하고 병합 결과로 대체
+        const oldItems = [...items];
+        // 기존 전체 삭제
+        for (const it of oldItems) {
+          await api('DELETE', `/items/${it.id}`);
+        }
+        // 병합 결과로 재생성
+        for (const stage of result.stages) {
+          const grp = result.groups[stage.id];
+          if (!grp) continue;
+          // user stories
+          for (const story of (grp.user_stories || [])) {
+            await api('POST', '/items', {
+              author: getAuthor(),
+              stage_id: stage.id,
+              text: story,
+              category: '기능',
+              category_item: '-',
+            });
+          }
+          // elements
+          for (const cat of ['기능', '사양', '서비스', '사업요소']) {
+            for (const elem of (grp.elements[cat] || [])) {
+              await api('POST', '/items', {
+                author: getAuthor(),
+                stage_id: stage.id,
+                text: `${stage.title} - ${cat}`,
+                category: cat,
+                category_item: elem,
+              });
+            }
+          }
+        }
+        await loadAll();
+        setStatus('유사 항목이 정리되었습니다!');
+      } catch (e) {
+        setStatus('오류: ' + e.message);
+      }
+    }
+
+    // ===================== PPT EXPORT =====================
+    async function exportPPT() {
+      setStatus('PPT 생성 중...');
+      try {
+        const res = await fetch(API + '/export/ppt', { method: 'POST' });
+        if (!res.ok) throw new Error('Export failed');
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'user_story_map.pptx';
+        document.body.appendChild(a); a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        setStatus('PPT 다운로드 완료!');
+      } catch (e) {
+        setStatus('PPT 오류: ' + e.message);
+      }
+    }
+
+    // ===================== THEME =====================
+    function toggleDark() {
+      document.body.classList.toggle('dark');
+    }
+
+    // ===================== INIT =====================
+    loadAll();
+  </script>
+</body>
+</html>
