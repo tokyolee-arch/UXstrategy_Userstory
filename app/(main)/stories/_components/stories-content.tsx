@@ -21,6 +21,7 @@ import {
   FileText,
   Trash2,
   Loader2,
+  Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { StoryListItem, StoryFilters, StorySortField } from "@/lib/types";
@@ -337,6 +338,7 @@ export function StoriesContent({
   const [view, setView] = useState<"card" | "table">("card");
   const [deleting, setDeleting] = useState<string | null>(null);
   const [stories, setStories] = useState(initialStories);
+  const [exporting, setExporting] = useState(false);
 
   async function handleDelete(storyId: string) {
     if (!confirm("이 스토리를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
@@ -381,6 +383,38 @@ export function StoriesContent({
               <List className="h-4 w-4" />
             </Button>
           </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1"
+            disabled={exporting || stories.length === 0}
+            onClick={async () => {
+              setExporting(true);
+              try {
+                const res = await fetch("/api/stories/export");
+                if (!res.ok) throw new Error();
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `user-stories-${new Date().toISOString().slice(0, 10)}.xlsx`;
+                a.click();
+                URL.revokeObjectURL(url);
+              } catch {
+                alert("엑셀 다운로드에 실패했습니다.");
+              } finally {
+                setExporting(false);
+              }
+            }}
+          >
+            {exporting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
+            <span className="hidden sm:inline">엑셀 저장</span>
+          </Button>
 
           <Button asChild size="sm" className="gap-1">
             <Link href="/stories/new">

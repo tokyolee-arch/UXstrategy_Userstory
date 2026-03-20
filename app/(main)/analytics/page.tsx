@@ -6,12 +6,10 @@ import {
   getTagFrequency,
   getAllTagFrequency,
   getStoryCountByProposer,
-  getMonthlyTrend,
 } from "@/lib/queries/analytics";
 import { SummaryCards } from "./_components/summary-cards";
 import { TagBarChart } from "./_components/tag-bar-chart";
 import { ProposerPieChart } from "./_components/proposer-pie-chart";
-import { MonthlyTrendChart } from "./_components/monthly-trend-chart";
 import { TagCloud } from "./_components/tag-cloud";
 
 function SectionSkeleton({ h = 300 }: { h?: number }) {
@@ -43,11 +41,6 @@ async function ProposerSection() {
   return <ProposerPieChart data={data} />;
 }
 
-async function TrendSection() {
-  const data = await getMonthlyTrend();
-  return <MonthlyTrendChart data={data} />;
-}
-
 async function CloudSection() {
   const data = await getAllTagFrequency();
   return <TagCloud tags={data} />;
@@ -73,10 +66,6 @@ export default function AnalyticsPage() {
           </Suspense>
         </div>
       </div>
-
-      <Suspense fallback={<SectionSkeleton />}>
-        <TrendSection />
-      </Suspense>
 
       <Suspense fallback={<SectionSkeleton h={180} />}>
         <CloudSection />
