@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { notFound } from "next/navigation";
 import { getStoryById } from "@/lib/queries/stories";
 import { createClient } from "@/lib/supabase/server";

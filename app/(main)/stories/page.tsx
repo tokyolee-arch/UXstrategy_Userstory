@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getStories, getProposers } from "@/lib/queries/stories";
 import type { StoryFilters, StorySortField } from "@/lib/types";
 import { isAdminEmail } from "@/lib/types";
