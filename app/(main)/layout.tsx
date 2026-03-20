@@ -14,12 +14,13 @@ import {
   BarChart3,
   LogOut,
   Menu,
+  NotebookPen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "대시보드", icon: LayoutDashboard },
-  { href: "/stories/new", label: "스토리 작성", icon: PenSquare },
+  { href: "/stories/new", label: "+ 스토리 작성", icon: PenSquare },
   { href: "/stories", label: "전체 목록", icon: List },
   { href: "/analytics", label: "분석", icon: BarChart3 },
 ];
@@ -65,9 +66,9 @@ export default function MainLayout({
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
-        setUserEmail(
-          user.user_metadata?.display_name || user.email || "사용자"
-        );
+        const displayName = user.user_metadata?.display_name || user.email || "사용자";
+        const team = user.user_metadata?.team;
+        setUserEmail(team ? `${displayName} (${team})` : displayName);
       }
     });
   }, [supabase]);
@@ -82,7 +83,8 @@ export default function MainLayout({
     <div className="flex h-screen overflow-hidden">
       {/* Desktop Sidebar */}
       <aside className="hidden w-60 shrink-0 border-r bg-sidebar md:flex md:flex-col">
-        <div className="flex h-14 items-center px-4">
+        <div className="flex h-14 items-center gap-2 px-4">
+          <NotebookPen className="h-5 w-5 text-foreground/70" />
           <h1 className="text-lg font-bold tracking-tight">User Story</h1>
         </div>
         <Separator />
@@ -104,7 +106,8 @@ export default function MainLayout({
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-60 p-0">
-                <div className="flex h-14 items-center px-4">
+                <div className="flex h-14 items-center gap-2 px-4">
+                  <NotebookPen className="h-5 w-5 text-foreground/70" />
                   <h1 className="text-lg font-bold tracking-tight">
                     User Story
                   </h1>

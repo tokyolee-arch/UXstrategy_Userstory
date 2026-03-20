@@ -51,7 +51,7 @@ export async function createStory(
 
     if (stagesError) {
       await supabase.from("user_stories").delete().eq("id", story.id);
-      return { error: `단계 저장 실패: ${stagesError.message}` };
+      return { error: `여정 저장 실패: ${stagesError.message}` };
     }
   }
 
@@ -127,7 +127,7 @@ export async function updateStory(
       .insert(stagesPayload);
 
     if (stagesError) {
-      return { error: `단계 저장 실패: ${stagesError.message}` };
+      return { error: `여정 저장 실패: ${stagesError.message}` };
     }
   }
 

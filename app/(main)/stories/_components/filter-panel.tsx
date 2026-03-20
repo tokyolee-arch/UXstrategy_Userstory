@@ -97,7 +97,7 @@ export function FilterPanel({
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="제목, 단계명, 태그 검색..."
+            placeholder="제목, 여정명, 태그 검색..."
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleKeywordSearch()}

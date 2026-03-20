@@ -23,6 +23,7 @@ import {
   Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { StoryRankings } from "./_components/story-rankings";
 
 /* ── skeleton helper ── */
 
@@ -260,6 +261,9 @@ export default function DashboardPage() {
           <TopTagsSection />
         </Suspense>
       </div>
+
+      {/* Story Rating Rankings */}
+      <StoryRankings />
     </div>
   );
 }

@@ -45,7 +45,7 @@ import { cn } from "@/lib/utils";
 
 const STEPS = [
   { num: 1, label: "기본 정보" },
-  { num: 2, label: "단계 (Phase)" },
+  { num: 2, label: "여정 (Journey)" },
   { num: 3, label: "기술 구현 요소" },
   { num: 4, label: "참고 이미지" },
 ] as const;
@@ -132,12 +132,12 @@ function StagesStep() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">단계 (Phase)</h3>
-        <Button type="button" variant="outline" size="sm" onClick={() => fields.length < 6 && append({ stage_name: "", user_story_texts: [{ value: "" }] })} disabled={fields.length >= 6} className="gap-1"><Plus className="h-4 w-4" />단계 추가 ({fields.length}/6)</Button>
+        <h3 className="text-lg font-semibold">여정 (Journey)</h3>
+        <Button type="button" variant="outline" size="sm" onClick={() => fields.length < 6 && append({ stage_name: "", user_story_texts: [{ value: "" }] })} disabled={fields.length >= 6} className="gap-1"><Plus className="h-4 w-4" />여정 추가 ({fields.length}/6)</Button>
       </div>
       {errors.stages?.message && <p className="text-sm text-destructive">{errors.stages.message}</p>}
       {fields.length === 0 && (
-        <Card className="border-dashed"><CardContent className="flex flex-col items-center justify-center py-8 text-muted-foreground"><p className="text-sm">아직 추가된 단계가 없습니다.</p><Button type="button" variant="outline" size="sm" className="mt-3 gap-1" onClick={() => append({ stage_name: "", user_story_texts: [{ value: "" }] })}><Plus className="h-4 w-4" />첫 번째 단계 추가</Button></CardContent></Card>
+        <Card className="border-dashed"><CardContent className="flex flex-col items-center justify-center py-8 text-muted-foreground"><p className="text-sm">아직 추가된 여정이 없습니다.</p><Button type="button" variant="outline" size="sm" className="mt-3 gap-1" onClick={() => append({ stage_name: "", user_story_texts: [{ value: "" }] })}><Plus className="h-4 w-4" />첫 번째 여정 추가</Button></CardContent></Card>
       )}
       {fields.map((field, idx) => (
         <Card key={field.id}>
@@ -147,8 +147,8 @@ function StagesStep() {
                 <Button type="button" variant="ghost" size="icon" className="h-5 w-5" disabled={idx === 0} onClick={() => swap(idx, idx - 1)}><ChevronUp className="h-3 w-3" /></Button>
                 <Button type="button" variant="ghost" size="icon" className="h-5 w-5" disabled={idx === fields.length - 1} onClick={() => swap(idx, idx + 1)}><ChevronDown className="h-3 w-3" /></Button>
               </div>
-              <Badge variant="secondary" className="shrink-0">Phase {idx + 1}</Badge>
-              <Input placeholder="단계명을 입력하세요" {...register(`stages.${idx}.stage_name`)} className="h-8 text-sm font-medium" />
+              <Badge variant="secondary" className="shrink-0">여정 {idx + 1}</Badge>
+              <Input placeholder="여정명을 입력하세요" {...register(`stages.${idx}.stage_name`)} className="h-8 text-sm font-medium" />
               <Button type="button" variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => toggleCollapse(idx)}>{collapsed[idx] ? <ChevronRight className="h-4 w-4" /> : <ChevronDownIcon className="h-4 w-4" />}</Button>
               <Button type="button" variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive" onClick={() => remove(idx)}><Trash2 className="h-4 w-4" /></Button>
             </div>
@@ -170,19 +170,35 @@ const TAG_CATEGORIES = [
   { value: "사업요소" as const, color: "bg-orange-100 text-orange-800 border-orange-200" },
 ] as const;
 
+type ExistingTag = { category: string; tag_name: string; count: number };
+
 function TechTagsStep() {
   const { control, getValues, watch } = useFormContext<StoryFormValues>();
   const { fields, append, remove } = useFieldArray({ control, name: "tech_tags" });
   const [inputs, setInputs] = useState<Record<string, string>>({ 기능: "", 사양: "", 서비스: "", 사업요소: "" });
+  const [existingTags, setExistingTags] = useState<ExistingTag[]>([]);
   const tagsWatch = watch("tech_tags");
 
-  const addTag = (cat: "기능" | "사양" | "서비스" | "사업요소") => {
-    const v = inputs[cat].trim();
+  useEffect(() => {
+    fetch("/api/tags")
+      .then((res) => res.json())
+      .then((data: ExistingTag[]) => setExistingTags(data))
+      .catch(() => {});
+  }, []);
+
+  const addTag = (cat: "기능" | "사양" | "서비스" | "사업요소", tagName?: string) => {
+    const v = (tagName ?? inputs[cat]).trim();
     if (!v) return;
     const tags = getValues("tech_tags");
     if (fields.some((_, i) => tags[i].category === cat && tags[i].tag_name === v)) return;
     append({ category: cat, tag_name: v });
-    setInputs((p) => ({ ...p, [cat]: "" }));
+    if (!tagName) setInputs((p) => ({ ...p, [cat]: "" }));
+  };
+
+  const handleDrop = (cat: "기능" | "사양" | "서비스" | "사업요소", e: React.DragEvent) => {
+    e.preventDefault();
+    const tagName = e.dataTransfer.getData("text/plain");
+    if (tagName) addTag(cat, tagName);
   };
 
   return (
@@ -196,18 +212,55 @@ function TechTagsStep() {
               return <TabsTrigger key={c.value} value={c.value}>{c.value}{cnt > 0 && <Badge variant="secondary" className="ml-1.5 h-5 min-w-[20px] px-1 text-[10px]">{cnt}</Badge>}</TabsTrigger>;
             })}
           </TabsList>
-          {TAG_CATEGORIES.map((cat) => (
-            <TabsContent key={cat.value} value={cat.value} className="space-y-4">
-              <div className="flex gap-2">
-                <Input placeholder={`${cat.value} 태그를 입력하세요`} value={inputs[cat.value]} onChange={(e) => setInputs((p) => ({ ...p, [cat.value]: e.target.value }))} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(cat.value); } }} className="h-9" />
-                <Button type="button" variant="outline" size="sm" onClick={() => addTag(cat.value)} className="shrink-0"><Plus className="mr-1 h-3.5 w-3.5" />추가</Button>
-              </div>
-              <div className="flex flex-wrap gap-2 min-h-[40px]">
-                {fields.map((field, idx) => { const tag = tagsWatch?.[idx]; if (!tag || tag.category !== cat.value) return null; return (<span key={field.id} className={cn("inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium", cat.color)}>{tag.tag_name}<button type="button" onClick={() => remove(idx)} className="ml-0.5 rounded-full p-0.5 hover:bg-black/10 transition-colors"><X className="h-3 w-3" /></button></span>); })}
-                {(!tagsWatch || tagsWatch.filter((t) => t.category === cat.value).length === 0) && <p className="text-xs text-muted-foreground py-2">아직 추가된 {cat.value} 태그가 없습니다.</p>}
-              </div>
-            </TabsContent>
-          ))}
+          {TAG_CATEGORIES.map((cat) => {
+            const inputVal = inputs[cat.value];
+            const currentTags = tagsWatch ?? [];
+            const suggestions = existingTags.filter(
+              (et) =>
+                et.category === cat.value &&
+                (!inputVal || et.tag_name.toLowerCase().includes(inputVal.toLowerCase())) &&
+                !currentTags.some((ct) => ct.category === cat.value && ct.tag_name === et.tag_name)
+            );
+
+            return (
+              <TabsContent key={cat.value} value={cat.value} className="space-y-4">
+                <div className="flex gap-2">
+                  <Input placeholder={`${cat.value} 태그를 입력하세요`} value={inputVal} onChange={(e) => setInputs((p) => ({ ...p, [cat.value]: e.target.value }))} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(cat.value); } }} className="h-9" />
+                  <Button type="button" variant="outline" size="sm" onClick={() => addTag(cat.value)} className="shrink-0"><Plus className="mr-1 h-3.5 w-3.5" />추가</Button>
+                </div>
+
+                {suggestions.length > 0 && (
+                  <div className="space-y-1.5">
+                    <div className="flex flex-wrap items-center gap-1.5 rounded-md border border-dashed border-muted-foreground/30 p-2 bg-muted/20">
+                      <span className="text-xs font-semibold text-muted-foreground shrink-0 mr-1">유형예시 :</span>
+                      {suggestions.slice(0, 15).map((et) => (
+                        <span
+                          key={`${et.category}::${et.tag_name}`}
+                          draggable
+                          onDragStart={(e) => e.dataTransfer.setData("text/plain", et.tag_name)}
+                          onClick={() => addTag(cat.value, et.tag_name)}
+                          className="inline-flex items-center gap-1 rounded-full border border-gray-300 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 px-2.5 py-0.5 text-xs font-medium cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors select-none"
+                        >
+                          {et.tag_name}
+                          <span className="text-[10px] opacity-50">({et.count})</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div
+                  className="flex flex-wrap gap-2 min-h-[40px] rounded-md border border-transparent transition-colors"
+                  onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("border-primary", "bg-primary/5"); }}
+                  onDragLeave={(e) => { e.currentTarget.classList.remove("border-primary", "bg-primary/5"); }}
+                  onDrop={(e) => { e.currentTarget.classList.remove("border-primary", "bg-primary/5"); handleDrop(cat.value, e); }}
+                >
+                  {fields.map((field, idx) => { const tag = tagsWatch?.[idx]; if (!tag || tag.category !== cat.value) return null; return (<span key={field.id} className={cn("inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium", cat.color)}>{tag.tag_name}<button type="button" onClick={() => remove(idx)} className="ml-0.5 rounded-full p-0.5 hover:bg-black/10 transition-colors"><X className="h-3 w-3" /></button></span>); })}
+                  {currentTags.filter((t) => t.category === cat.value).length === 0 && <p className="text-xs text-muted-foreground py-2">아직 추가된 {cat.value} 태그가 없습니다. 위에서 클릭하거나 드래그하여 추가하세요.</p>}
+                </div>
+              </TabsContent>
+            );
+          })}
         </Tabs>
       </CardContent>
     </Card>
@@ -297,8 +350,10 @@ export function StoryForm({
     if (mode === "create") {
       supabase.auth.getUser().then(({ data: { user } }) => {
         if (user) {
-          const name = user.user_metadata?.display_name || user.email?.split("@")[0] || "";
-          form.setValue("proposer_name", name);
+          const displayName = user.user_metadata?.display_name || user.email?.split("@")[0] || "";
+          const team = user.user_metadata?.team;
+          const proposerLabel = team ? `${displayName} (${team})` : displayName;
+          form.setValue("proposer_name", proposerLabel);
         }
       });
     }

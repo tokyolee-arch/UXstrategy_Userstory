@@ -33,9 +33,9 @@ const TAG_ROW_LABEL: Record<string, string> = {
 
 const CATEGORIES = ["기능", "사양", "서비스", "사업요소"] as const;
 
-/* ── Phase Arrow (CSS clip-path chevron) ── */
+/* ── Journey Arrow (CSS clip-path chevron) ── */
 
-function PhaseArrow({
+function JourneyArrow({
   name,
   index,
 }: {
@@ -98,12 +98,12 @@ export function StorySlide({ story }: { story: StoryListItem }) {
         </div>
       </div>
 
-      {/* ── Phase Arrows ── */}
+      {/* ── Journey Arrows ── */}
       {stages.length > 0 && (
         <div className="px-4 sm:px-8 pt-6">
           <div className="flex">
             {stages.map((s, i) => (
-              <PhaseArrow
+              <JourneyArrow
                 key={s.id}
                 name={s.stage_name}
                 index={i}

@@ -196,7 +196,7 @@ function StoryTable({
               </th>
             ))}
             <th className="w-20 px-3 py-2.5 text-center font-medium text-muted-foreground hidden lg:table-cell">
-              단계
+              여정
             </th>
             <th className="w-20 px-3 py-2.5 text-center font-medium text-muted-foreground hidden lg:table-cell">
               태그

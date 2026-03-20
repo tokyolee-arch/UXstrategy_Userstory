@@ -3,6 +3,7 @@ import { getStoryById } from "@/lib/queries/stories";
 import { createClient } from "@/lib/supabase/server";
 import { StorySlide } from "./_components/story-slide";
 import { StoryActions } from "./_components/story-actions";
+import { StoryAdvices } from "./_components/story-advices";
 
 export default async function StoryDetailPage({
   params,
@@ -22,6 +23,7 @@ export default async function StoryDetailPage({
     <div className="space-y-4">
       <StorySlide story={story} />
       <StoryActions storyId={story.id} isOwner={isOwner} />
+      <StoryAdvices storyId={story.id} />
     </div>
   );
 }
