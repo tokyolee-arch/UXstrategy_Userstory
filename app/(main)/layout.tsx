@@ -15,8 +15,10 @@ import {
   LogOut,
   Menu,
   NotebookPen,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { isAdminEmail } from "@/lib/types";
 
 const navItems = [
   { href: "/dashboard", label: "대시보드", icon: LayoutDashboard },
@@ -61,6 +63,7 @@ export default function MainLayout({
   const supabase = createClient();
 
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   useEffect(() => {
@@ -69,6 +72,7 @@ export default function MainLayout({
         const displayName = user.user_metadata?.display_name || user.email || "사용자";
         const team = user.user_metadata?.team;
         setUserEmail(team ? `${displayName} (${team})` : displayName);
+        setIsAdmin(isAdminEmail(user.email));
       }
     });
   }, [supabase]);
@@ -120,6 +124,12 @@ export default function MainLayout({
           </div>
 
           <div className="flex items-center gap-3">
+            {isAdmin && (
+              <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-foreground/20 bg-foreground/5 px-2 py-0.5 text-[10px] font-semibold text-foreground/70">
+                <ShieldCheck className="h-3 w-3" />
+                관리자
+              </span>
+            )}
             {userEmail && (
               <span className="text-sm text-muted-foreground hidden sm:inline">
                 {userEmail}

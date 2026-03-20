@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { storyFormSchema, type StoryFormValues } from "@/lib/validations/story";
+import { isAdminEmail } from "@/lib/types";
 
 export async function createStory(
   data: StoryFormValues & { status: "draft" | "submitted" }
@@ -148,4 +149,34 @@ export async function updateStory(
   }
 
   return { success: true, storyId };
+}
+
+export async function deleteStory(storyId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "인증이 필요합니다." };
+  }
+
+  if (!isAdminEmail(user.email)) {
+    return { error: "관리자만 스토리를 삭제할 수 있습니다." };
+  }
+
+  await supabase.from("story_advices").delete().eq("story_id", storyId);
+  await supabase.from("tech_tags").delete().eq("story_id", storyId);
+  await supabase.from("stages").delete().eq("story_id", storyId);
+
+  const { error } = await supabase
+    .from("user_stories")
+    .delete()
+    .eq("id", storyId);
+
+  if (error) {
+    return { error: `삭제 실패: ${error.message}` };
+  }
+
+  return { success: true };
 }

@@ -19,9 +19,12 @@ import {
   ArrowUp,
   ArrowDown,
   FileText,
+  Trash2,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { StoryListItem, StoryFilters, StorySortField } from "@/lib/types";
+import { deleteStory } from "@/lib/actions/story";
 import { FilterPanel } from "./filter-panel";
 import { Pagination } from "./pagination";
 
@@ -73,47 +76,71 @@ function formatDate(d: string) {
 
 /* ── Card View ── */
 
-function StoryCard({ story }: { story: StoryListItem }) {
+function StoryCard({
+  story,
+  isAdmin,
+  onDelete,
+}: {
+  story: StoryListItem;
+  isAdmin?: boolean;
+  onDelete?: (id: string) => void;
+}) {
   const tags = story.tech_tags ?? [];
   const visibleTags = tags.slice(0, 5);
   const overflow = tags.length - 5;
 
   return (
-    <Link href={`/stories/${story.id}`}>
-      <Card className="h-full transition-shadow hover:shadow-md cursor-pointer">
-        <CardHeader className="pb-2 px-4 pt-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono text-muted-foreground">
-              #{story.seq_no}
-            </span>
-            <StatusBadge status={story.status} />
-          </div>
-        </CardHeader>
-        <CardContent className="px-4 pb-4 space-y-2.5">
-          <h3 className="text-sm font-semibold leading-snug line-clamp-2">
-            {story.title}
-          </h3>
-
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>{story.proposer_name ?? "—"}</span>
-            <span>{formatDate(story.created_at)}</span>
-          </div>
-
-          {visibleTags.length > 0 && (
-            <div className="flex flex-wrap gap-1 pt-0.5">
-              {visibleTags.map((t) => (
-                <TagPill key={t.id} category={t.category} name={t.tag_name} />
-              ))}
-              {overflow > 0 && (
-                <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                  +{overflow}
-                </span>
-              )}
+    <div className="relative group">
+      <Link href={`/stories/${story.id}`}>
+        <Card className="h-full transition-shadow hover:shadow-md cursor-pointer">
+          <CardHeader className="pb-2 px-4 pt-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono text-muted-foreground">
+                #{story.seq_no}
+              </span>
+              <StatusBadge status={story.status} />
             </div>
-          )}
-        </CardContent>
-      </Card>
-    </Link>
+          </CardHeader>
+          <CardContent className="px-4 pb-4 space-y-2.5">
+            <h3 className="text-sm font-semibold leading-snug line-clamp-2">
+              {story.title}
+            </h3>
+
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>{story.proposer_name ?? "—"}</span>
+              <span>{formatDate(story.created_at)}</span>
+            </div>
+
+            {visibleTags.length > 0 && (
+              <div className="flex flex-wrap gap-1 pt-0.5">
+                {visibleTags.map((t) => (
+                  <TagPill key={t.id} category={t.category} name={t.tag_name} />
+                ))}
+                {overflow > 0 && (
+                  <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                    +{overflow}
+                  </span>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </Link>
+      {isAdmin && onDelete && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onDelete(story.id);
+          }}
+          className="absolute top-3 right-3 p-1.5 rounded-md bg-destructive/10 text-destructive opacity-0 group-hover:opacity-100 hover:bg-destructive/20 transition-all z-10"
+          title="스토리 삭제"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -155,10 +182,14 @@ function StoryTable({
   stories,
   sort,
   order,
+  isAdmin,
+  onDelete,
 }: {
   stories: StoryListItem[];
   sort: string;
   order: string;
+  isAdmin?: boolean;
+  onDelete?: (id: string) => void;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -201,6 +232,11 @@ function StoryTable({
             <th className="w-20 px-3 py-2.5 text-center font-medium text-muted-foreground hidden lg:table-cell">
               태그
             </th>
+            {isAdmin && (
+              <th className="w-14 px-3 py-2.5 text-center font-medium text-muted-foreground">
+                삭제
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -235,6 +271,21 @@ function StoryTable({
               <td className="px-3 py-2.5 text-center text-xs text-muted-foreground hidden lg:table-cell">
                 {s.tech_tags?.length ?? 0}
               </td>
+              {isAdmin && onDelete && (
+                <td className="px-3 py-2.5 text-center">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(s.id);
+                    }}
+                    className="p-1 rounded-md text-destructive hover:bg-destructive/10 transition-colors"
+                    title="스토리 삭제"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
@@ -270,17 +321,35 @@ function EmptyState() {
 /* ── Main Content ── */
 
 export function StoriesContent({
-  stories,
+  stories: initialStories,
   total,
   proposers,
   filters,
+  isAdmin,
 }: {
   stories: StoryListItem[];
   total: number;
   proposers: string[];
   filters: StoryFilters;
+  isAdmin?: boolean;
 }) {
+  const router = useRouter();
   const [view, setView] = useState<"card" | "table">("card");
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [stories, setStories] = useState(initialStories);
+
+  async function handleDelete(storyId: string) {
+    if (!confirm("이 스토리를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
+    setDeleting(storyId);
+    const result = await deleteStory(storyId);
+    if (result.error) {
+      alert(result.error);
+    } else {
+      setStories((prev) => prev.filter((s) => s.id !== storyId));
+      router.refresh();
+    }
+    setDeleting(null);
+  }
 
   return (
     <div className="space-y-4">
@@ -329,12 +398,21 @@ export function StoriesContent({
       <Separator />
 
       {/* Content */}
+      {deleting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="flex items-center gap-2 rounded-lg bg-background p-4 shadow-lg border">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="text-sm">삭제 중...</span>
+          </div>
+        </div>
+      )}
+
       {stories.length === 0 ? (
         <EmptyState />
       ) : view === "card" ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {stories.map((s) => (
-            <StoryCard key={s.id} story={s} />
+            <StoryCard key={s.id} story={s} isAdmin={isAdmin} onDelete={handleDelete} />
           ))}
         </div>
       ) : (
@@ -342,6 +420,8 @@ export function StoriesContent({
           stories={stories}
           sort={filters.sort ?? "created_at"}
           order={filters.order ?? "desc"}
+          isAdmin={isAdmin}
+          onDelete={handleDelete}
         />
       )}
 

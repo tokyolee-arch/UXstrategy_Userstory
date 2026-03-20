@@ -1,5 +1,7 @@
 import { getStories, getProposers } from "@/lib/queries/stories";
 import type { StoryFilters, StorySortField } from "@/lib/types";
+import { isAdminEmail } from "@/lib/types";
+import { createClient } from "@/lib/supabase/server";
 import { StoriesContent } from "./_components/stories-content";
 
 function parseSearchParams(
@@ -31,6 +33,10 @@ export default async function StoriesPage({
 }) {
   const filters = parseSearchParams(searchParams);
 
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const isAdmin = isAdminEmail(user?.email);
+
   const [{ stories, total }, proposers] = await Promise.all([
     getStories(filters),
     getProposers(),
@@ -42,6 +48,7 @@ export default async function StoriesPage({
       total={total}
       proposers={proposers}
       filters={filters}
+      isAdmin={isAdmin}
     />
   );
 }
